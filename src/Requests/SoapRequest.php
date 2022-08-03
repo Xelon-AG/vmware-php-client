@@ -7,16 +7,18 @@ trait SoapRequest
     private function vmRequest(string $method, string $vmId, array $requestBody = [])
     {
         $soapMessage = [
-            '_this' =>[
-              '_' => $vmId,
-              'type' => 'VirtualMachine'
-            ]
+            '_this' => [
+                '_' => $vmId,
+                'type' => 'VirtualMachine',
+            ],
         ];
         $soapMessage = array_merge($soapMessage, $requestBody);
+
         return $this->soapClient->$method($soapMessage);
     }
 
-    private function array_to_object($array) {
+    private function array_to_object($array)
+    {
         $obj = new \stdClass();
 
         foreach ($array as $k => $v) {

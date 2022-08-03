@@ -15,21 +15,21 @@ trait ApiRequest
         try {
             return json_decode($this->guzzleClient->request($method, $uri, $options)->getBody());
         } catch (ConnectException $e) {
-            Log::error('Rest api Connect exception: ' . $e->getMessage());
+            Log::error('Rest api Connect exception: '.$e->getMessage());
         } catch (ServerException $e) {
-            Log::error('Rest api server exception: ' . $e->getMessage());
+            Log::error('Rest api server exception: '.$e->getMessage());
         } catch (RequestException $e) {
-            Log::error('Rest api Request exception: ' . $e->getMessage());
+            Log::error('Rest api Request exception: '.$e->getMessage());
+
             return [
                 'isError' => true,
                 'code' => $e->getCode(),
-                'info' => json_decode($e->getResponse()->getBody()->getContents())
+                'info' => json_decode($e->getResponse()->getBody()->getContents()),
             ];
         } catch (ClientException $e) {
             // if 401, create new session and reply attempt
         } catch (\Exception $e) {
-            Log::error('Rest api exception : ' . $e->getMessage());
+            Log::error('Rest api exception : '.$e->getMessage());
         }
-
     }
 }

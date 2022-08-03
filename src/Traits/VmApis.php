@@ -280,8 +280,8 @@ trait VmApis
                 'cores_per_socket' => $coresPerSocket,
                 'count' => $count,
                 'hot_add_enabled' => $hotAddEnabled,
-                'hot_remove_enabled' => $hotRemoveEnabled
-            ]
+                'hot_remove_enabled' => $hotRemoveEnabled,
+            ],
         ]);
     }
 
@@ -390,8 +390,8 @@ trait VmApis
         return $this->request('patch', "/api/vcenter/vm/$vmId/hardware/memory", [
             'json' => [
                 'hot_add_enabled' => $hotAddEnabled,
-                'size_MiB' => $size
-            ]
+                'size_MiB' => $size,
+            ],
         ]);
     }
 
@@ -560,12 +560,10 @@ trait VmApis
         // TODO:
     }
 
-
     public function getToolsInstaller()
     {
         // TODO:
     }
-
 
     public function connectToolsInstaller()
     {

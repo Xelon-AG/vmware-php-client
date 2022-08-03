@@ -2,13 +2,13 @@
 
 namespace Xelon\VmWareClient;
 
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class VmWareClientInit
 {
@@ -48,7 +48,6 @@ class VmWareClientInit
             default:
                 throw new \Exception('Illegal mode type');
         }
-
     }
 
     private function initRestSession(): void
@@ -56,7 +55,7 @@ class VmWareClientInit
         $this->guzzleClient = new GuzzleClient(['verify' => false, 'base_uri' => $this->ip]);
         $sessionInfo = Cache::get("vcenter-rest-session-$this->ip");
 
-        if (!$sessionInfo) {
+        if (! $sessionInfo) {
             $this->createRestSession();
         } elseif ($this->isSessionExpired($sessionInfo['expired_at'])) {
             $this->deleteRestSession($sessionInfo['api_session_id']);
@@ -74,18 +73,18 @@ class VmWareClientInit
 
             Cache::add("vcenter-rest-session-$this->ip", [
                 'api_session_id' => $apiSessionId,
-                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30)
+                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
             ]);
 
             $this->createNewGuzzleClient($apiSessionId);
         } catch (ConnectException $e) {
-            Log::error('Rest api Connect exception: ' . $e->getMessage());
+            Log::error('Rest api Connect exception: '.$e->getMessage());
         } catch (ServerException $e) {
-            Log::error('Rest api server exception: ' . $e->getMessage());
+            Log::error('Rest api server exception: '.$e->getMessage());
         } catch (RequestException $e) {
-            Log::error('Rest api Request exception: ' . $e->getMessage());
+            Log::error('Rest api Request exception: '.$e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Rest api exception : ' . $e->getMessage());
+            Log::error('Rest api exception : '.$e->getMessage());
         }
     }
 
@@ -95,9 +94,10 @@ class VmWareClientInit
             $this->guzzleClient->delete('api/session', [
                 'headers' => [
                     'vmware-api-session-id' => $apiSessionId,
-                ]
+                ],
             ]);
-        } catch (\Exception $exception) {}
+        } catch (\Exception $exception) {
+        }
 
         Cache::forget("vcenter-rest-session-$this->ip");
     }
@@ -114,8 +114,8 @@ class VmWareClientInit
             'base_uri' => $this->ip,
             'headers' => [
                 'vmware-api-session-id' => $apiSessionId,
-                'content-type' => 'application/json'
-            ]
+                'content-type' => 'application/json',
+            ],
         ]);
     }
 
@@ -123,7 +123,7 @@ class VmWareClientInit
     {
         $sessionInfo = Cache::get("vcenter-soap-session-$this->ip");
 
-        if (!$sessionInfo) {
+        if (! $sessionInfo) {
             $this->createSoapSession();
         } elseif ($this->isSessionExpired($sessionInfo['expired_at'])) {
             $this->createSoapSession();
@@ -142,9 +142,9 @@ class VmWareClientInit
                     'ssl' => [
                         'verify_peer' => false,
                         'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    ]
-                ])
+                        'allow_self_signed' => true,
+                    ],
+                ]),
             ]);
 
             $serviceInstanseMessage['_this'] = new \Soapvar('ServiceInstance', XSD_STRING, 'ServiceInstance');
@@ -154,16 +154,16 @@ class VmWareClientInit
             $loginMessage = [
                 '_this' => $serviceContent->sessionManager,
                 'userName' => $this->login,
-                'password' => $this->password
+                'password' => $this->password,
             ];
             $this->soapClient->Login($loginMessage);
 
             Cache::add("vcenter-soap-session-$this->ip", [
                 'vmware_soap_session' => $this->soapClient->_cookies['vmware_soap_session'][0],
-                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30)
+                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
             ]);
         } catch (\Exception $e) {
-            Log::error('Soap api exception : ' . $e->getMessage());
+            Log::error('Soap api exception : '.$e->getMessage());
         }
     }
 
@@ -176,9 +176,9 @@ class VmWareClientInit
                 'ssl' => [
                     'verify_peer' => false,
                     'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                ]
-            ])
+                    'allow_self_signed' => true,
+                ],
+            ]),
         ]);
 
         $this->soapClient->__setCookie('vmware_soap_session', $soapSessionToken);
