@@ -1,0 +1,65 @@
+{
+    "name": "xelon-ag/vmware-php-client",
+    "description": "PHP API Client for VmWare",
+    "keywords": [
+        "xelon-ag",
+        "laravel",
+        "vmware-php-client"
+    ],
+    "homepage": "https://github.com/xelon-ag/vmware-php-client",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andrii Hazhur",
+            "email": "a.hazhur@bitcat.agency",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "spatie/laravel-package-tools": "^1.9.2",
+        "illuminate/contracts": "^8.83.20",
+        "guzzlehttp/guzzle": "^7.0.1"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^5.0",
+        "pestphp/pest": "^1.21",
+        "pestphp/pest-plugin-laravel": "^1.1",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Xelon\\VmWareClient\\": "src",
+            "Xelon\\VmWareClient\\Database\\Factories\\": "database/factories"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Xelon\\VmWareClient\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Xelon\\VmWareClient\\VmWareClientServiceProvider"
+            ],
+            "aliases": {
+                "VmWareClient": "Xelon\\VmWareClient\\Facades\\VmWareClient"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
