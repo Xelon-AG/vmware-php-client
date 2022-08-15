@@ -2,13 +2,13 @@
 
 namespace Xelon\VmWareClient;
 
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class VmWareClientInit
 {
@@ -26,7 +26,7 @@ class VmWareClientInit
 
     protected ?GuzzleClient $guzzleClient;
 
-    public ?\SoapClient $soapClient;
+    protected ?\SoapClient $soapClient;
 
     public function __construct(string $ip, string $login, string $password, string $mode = self::MODE_REST)
     {
@@ -48,7 +48,6 @@ class VmWareClientInit
             default:
                 throw new \Exception('Illegal mode type');
         }
-
     }
 
     private function initRestSession(): void
@@ -95,9 +94,10 @@ class VmWareClientInit
             $this->guzzleClient->delete('api/session', [
                 'headers' => [
                     'vmware-api-session-id' => $apiSessionId,
-                ]
+                ],
             ]);
-        } catch (\Exception $exception) {}
+        } catch (\Exception $exception) {
+        }
 
         Cache::forget("vcenter-rest-session-$this->ip");
     }
@@ -114,8 +114,8 @@ class VmWareClientInit
             'base_uri' => $this->ip,
             'headers' => [
                 'vmware-api-session-id' => $apiSessionId,
-                'content-type' => 'application/json'
-            ]
+                'content-type' => 'application/json',
+            ],
         ]);
     }
 
@@ -123,7 +123,7 @@ class VmWareClientInit
     {
         $sessionInfo = Cache::get("vcenter-soap-session-$this->ip");
 
-        if (!$sessionInfo) {
+        if (! $sessionInfo) {
             $this->createSoapSession();
         } elseif ($this->isSessionExpired($sessionInfo['expired_at'])) {
             $this->createSoapSession();
@@ -142,9 +142,9 @@ class VmWareClientInit
                     'ssl' => [
                         'verify_peer' => false,
                         'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    ]
-                ])
+                        'allow_self_signed' => true,
+                    ],
+                ]),
             ]);
 
             $serviceInstanseMessage['_this'] = new \Soapvar('ServiceInstance', XSD_STRING, 'ServiceInstance');
@@ -154,16 +154,16 @@ class VmWareClientInit
             $loginMessage = [
                 '_this' => $serviceContent->sessionManager,
                 'userName' => $this->login,
-                'password' => $this->password
+                'password' => $this->password,
             ];
             $this->soapClient->Login($loginMessage);
 
-            /*Cache::add("vcenter-soap-session-$this->ip", [
+            Cache::add("vcenter-soap-session-$this->ip", [
                 'vmware_soap_session' => $this->soapClient->_cookies['vmware_soap_session'][0],
-                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30)
-            ]);*/
+                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
+            ]);
         } catch (\Exception $e) {
-            Log::error('Soap api exception : ' . $e->getMessage());
+            Log::error('Soap api exception : '.$e->getMessage());
         }
     }
 
@@ -171,21 +171,14 @@ class VmWareClientInit
     {
         $this->soapClient = new \SoapClient("$this->ip/sdk/vimService.wsdl", [
             'location' => "$this->ip/sdk/",
-            'encoding' => 'UTF-8' ,
-            //'cache_wsdl' => WSDL_CACHE_MEMORY,
-            //'compression'=> SOAP_COMPRESSION_ACCEPT|SOAP_COMPRESSION_GZIP,
-            //'soap_version'=>SOAP_1_2,
-            //'keep_alive'=>true,
-            'exceptions'=>true,
-            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
-            'trace'=>1,
+            'trace' => 1,
             'stream_context' => stream_context_create([
                 'ssl' => [
                     'verify_peer' => false,
                     'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                ]
-            ])
+                    'allow_self_signed' => true,
+                ],
+            ]),
         ]);
 
         $this->soapClient->__setCookie('vmware_soap_session', $soapSessionToken);
