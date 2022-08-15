@@ -26,7 +26,7 @@ class VmWareClientInit
 
     protected ?GuzzleClient $guzzleClient;
 
-    protected ?\SoapClient $soapClient;
+    public ?\SoapClient $soapClient;
 
     public function __construct(string $ip, string $login, string $password, string $mode = self::MODE_REST)
     {
@@ -158,10 +158,10 @@ class VmWareClientInit
             ];
             $this->soapClient->Login($loginMessage);
 
-            Cache::add("vcenter-soap-session-$this->ip", [
+            /*Cache::add("vcenter-soap-session-$this->ip", [
                 'vmware_soap_session' => $this->soapClient->_cookies['vmware_soap_session'][0],
                 'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30)
-            ]);
+            ]);*/
         } catch (\Exception $e) {
             Log::error('Soap api exception : ' . $e->getMessage());
         }
@@ -171,7 +171,14 @@ class VmWareClientInit
     {
         $this->soapClient = new \SoapClient("$this->ip/sdk/vimService.wsdl", [
             'location' => "$this->ip/sdk/",
-            'trace' => 1,
+            'encoding' => 'UTF-8' ,
+            //'cache_wsdl' => WSDL_CACHE_MEMORY,
+            //'compression'=> SOAP_COMPRESSION_ACCEPT|SOAP_COMPRESSION_GZIP,
+            //'soap_version'=>SOAP_1_2,
+            //'keep_alive'=>true,
+            'exceptions'=>true,
+            'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
+            'trace'=>1,
             'stream_context' => stream_context_create([
                 'ssl' => [
                     'verify_peer' => false,
