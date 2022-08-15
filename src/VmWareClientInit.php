@@ -55,7 +55,7 @@ class VmWareClientInit
         $this->guzzleClient = new GuzzleClient(['verify' => false, 'base_uri' => $this->ip]);
         $sessionInfo = Cache::get("vcenter-rest-session-$this->ip");
 
-        if (!$sessionInfo) {
+        if (! $sessionInfo) {
             $this->createRestSession();
         } elseif ($this->isSessionExpired($sessionInfo['expired_at'])) {
             $this->deleteRestSession($sessionInfo['api_session_id']);
@@ -73,18 +73,18 @@ class VmWareClientInit
 
             Cache::add("vcenter-rest-session-$this->ip", [
                 'api_session_id' => $apiSessionId,
-                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30)
+                'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
             ]);
 
             $this->createNewGuzzleClient($apiSessionId);
         } catch (ConnectException $e) {
-            Log::error('Rest api Connect exception: ' . $e->getMessage());
+            Log::error('Rest api Connect exception: '.$e->getMessage());
         } catch (ServerException $e) {
-            Log::error('Rest api server exception: ' . $e->getMessage());
+            Log::error('Rest api server exception: '.$e->getMessage());
         } catch (RequestException $e) {
-            Log::error('Rest api Request exception: ' . $e->getMessage());
+            Log::error('Rest api Request exception: '.$e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Rest api exception : ' . $e->getMessage());
+            Log::error('Rest api exception : '.$e->getMessage());
         }
     }
 

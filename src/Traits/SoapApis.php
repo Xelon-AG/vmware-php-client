@@ -3,7 +3,6 @@
 namespace Xelon\VmWareClient\Traits;
 
 use Xelon\VmWareClient\Requests\SoapRequest;
-use SoapVar;
 use Xelon\VmWareClient\Transform\SoapTransform;
 
 trait SoapApis
@@ -29,14 +28,14 @@ trait SoapApis
                 'deviceChange' => [
                     '@type' => 'VirtualDeviceConfigSpec',
                     'operation' => 'add',
-                    'fileOperation'  => 'create',
+                    'fileOperation' => 'create',
                     'device' => [
                         '@type' => 'VirtualDisk',
                         'key' => -101,
                         'deviceInfo' => [
-                            '@type' =>  'Description',
-                            "label"=> $name,
-                            "summary"=> $name
+                            '@type' => 'Description',
+                            'label' => $name,
+                            'summary' => $name,
                         ],
                         'backing' => [
                             '@type' => 'VirtualDiskFlatVer2BackingInfo',
@@ -48,18 +47,18 @@ trait SoapApis
                         'controllerKey' => 1000,
                         'unitNumber' => $unitNumber,
                         'capacityInKB' => $capacityInKB,
-                        "capacityInBytes" => $capacityInKB * 1024,
+                        'capacityInBytes' => $capacityInKB * 1024,
                         'storageIOAllocation' => [
                             'limit' => $isHdd ? 3200 : -1,
                             'shares' => [
                                 '@type' => 'SharesInfo',
                                 'shares' => 1000,
-                                'level' => 'normal'
+                                'level' => 'normal',
                             ],
                         ],
                     ],
                 ],
-            ]
+            ],
         ];
 
         return $this->reconfigVmTask($vmId, $this->arrayToSoapVar($body));

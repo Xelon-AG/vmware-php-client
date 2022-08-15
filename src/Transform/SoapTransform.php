@@ -21,6 +21,7 @@ trait SoapTransform
                 $data[$key] = $value;
             }
         }
+
         return $data;
     }
 }
