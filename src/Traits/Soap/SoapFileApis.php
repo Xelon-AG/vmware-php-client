@@ -2,10 +2,10 @@
 
 namespace Xelon\VmWareClient\Traits\Soap;
 
+use Exception;
+use GuzzleHttp\Client as GuzzleClient;
 use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
-use GuzzleHttp\Client as GuzzleClient;
-use Exception;
 
 trait SoapFileApis
 {
@@ -35,22 +35,22 @@ trait SoapFileApis
         $body = [
             '_this' => [
                 'type' => 'GuestFileManager',
-                '_' => 'guestOperationsFileManager'
+                '_' => 'guestOperationsFileManager',
             ],
             'vm' => [
                 'type' => 'VirtualMachine',
-                '_' => $vmId
+                '_' => $vmId,
             ],
             'auth' => [
                 '@type' => 'NamePasswordAuthentication',
                 'interactiveSession' => true,
                 'username' => $username,
-                'password' => $password
+                'password' => $password,
             ],
             'guestFilePath' => "{$guestFilePath}",
             'fileAttributes' => new \stdClass(),
             'fileSize' => strlen($script),
-            'overwrite' => true
+            'overwrite' => true,
         ];
 
         $response = $this->soapClient->InitiateFileTransferToGuest($this->arrayToSoapVar($body));
@@ -78,21 +78,21 @@ trait SoapFileApis
         $body = [
             '_this' => [
                 'type' => 'GuestFileManager',
-                '_' => 'guestOperationsFileManager'
+                '_' => 'guestOperationsFileManager',
             ],
             'vm' => [
                 'type' => 'VirtualMachine',
-                '_' => $vmId
+                '_' => $vmId,
             ],
             'auth' => [
                 '@type' => 'NamePasswordAuthentication',
                 'interactiveSession' => false,
                 'username' => $username,
-                'password' => $password
+                'password' => $password,
             ],
             'prefix' => $prefix,
             'suffix' => $sufix,
-            'directoryPath' => $directoryPath
+            'directoryPath' => $directoryPath,
         ];
 
         return $this->soapClient->CreateTemporaryDirectoryInGuest($this->arrayToSoapVar($body));
@@ -107,20 +107,20 @@ trait SoapFileApis
         $body = [
             '_this' => [
                 'type' => 'GuestFileManager',
-                '_' => 'guestOperationsFileManager'
+                '_' => 'guestOperationsFileManager',
             ],
             'vm' => [
                 'type' => 'VirtualMachine',
-                '_' => $vmId
+                '_' => $vmId,
             ],
             'auth' => [
                 '@type' => 'NamePasswordAuthentication',
                 'interactiveSession' => false,
                 'username' => $username,
-                'password' => $password
+                'password' => $password,
             ],
             'directoryPath' => $directoryPath,
-            'recursive' => true
+            'recursive' => true,
         ];
 
         return $this->soapClient->DeleteDirectoryInGuest($this->arrayToSoapVar($body));
@@ -136,22 +136,22 @@ trait SoapFileApis
         $body = [
             '_this' => [
                 'type' => 'GuestProcessManager',
-                '_' => 'guestOperationsProcessManager'
+                '_' => 'guestOperationsProcessManager',
             ],
             'vm' => [
                 'type' => 'VirtualMachine',
-                '_' => $vmId
+                '_' => $vmId,
             ],
             'auth' => [
                 '@type' => 'NamePasswordAuthentication',
                 'interactiveSession' => false,
                 'username' => $username,
-                'password' => $password
+                'password' => $password,
             ],
             'spec' => [
                 'programPath' => $program,
-                'arguments' => "{$filePath}"
-            ]
+                'arguments' => "{$filePath}",
+            ],
         ];
 
         return $this->soapClient->StartProgramInGuest($this->arrayToSoapVar($body));

@@ -15,21 +15,21 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => 'propertyCollector',
-                'type' => 'PropertyCollector'
+                'type' => 'PropertyCollector',
             ],
             'specSet' => [
                 'propSet' => [
                     'type' => 'VirtualMachine',
-                    'all' => !$pathSet,
-                    'pathSet' => $pathSet
+                    'all' => ! $pathSet,
+                    'pathSet' => $pathSet,
                 ],
                 'objectSet' => [
                     'obj' => [
                         '_' => $vmId,
-                        'type' => 'VirtualMachine'
-                    ]
-                ]
-            ]
+                        'type' => 'VirtualMachine',
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->soapClient->RetrieveProperties($body);
@@ -44,21 +44,21 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => 'propertyCollector',
-                'type' => 'PropertyCollector'
+                'type' => 'PropertyCollector',
             ],
             'specSet' => [
                 'propSet' => [
                     'type' => 'Task',
-                    'all' => !$pathSet,
-                    'pathSet' => $pathSet
+                    'all' => ! $pathSet,
+                    'pathSet' => $pathSet,
                 ],
                 'objectSet' => [
                     'obj' => [
                         '_' => $taskId,
-                        'type' => 'Task'
-                    ]
-                ]
-            ]
+                        'type' => 'Task',
+                    ],
+                ],
+            ],
         ];
 
         $result = $this->soapClient->RetrieveProperties($body);
@@ -78,19 +78,19 @@ trait SoapVmApis
         $body = [
             'folder' => [
                 'type' => 'Folder',
-                '_' => $params['folder']
+                '_' => $params['folder'],
             ],
             'name' => $params['name'],
             'spec' => [
                 'location' => [
                     'datastore' => [
                         'type' => 'Datastore',
-                        '_' => $params['spec']['location']['datastore']
+                        '_' => $params['spec']['location']['datastore'],
                     ],
                     'pool' => [
                         'type' => 'ResourcePool',
-                        '_' => $params['spec']['location']['pool']
-                    ]
+                        '_' => $params['spec']['location']['pool'],
+                    ],
                 ],
                 'template' => $params['spec']['template'] ?? false,
                 'config' => [
@@ -108,7 +108,7 @@ trait SoapVmApis
                         '@type' => 'VirtualMachineBootOptionsBootableCdromDevice'
                     ]
                 ],*/
-            ]
+            ],
         ];
 
         return $this->vmRequest('CloneVM_Task', $vmId, $this->arrayToSoapVar($body));
@@ -128,7 +128,7 @@ trait SoapVmApis
                     '@type' => 'VirtualDeviceConfigSpec',
                     'operation' => 'add',
                     'fileOperation' => 'create',
-                    'device' => $this->data->addVirtualDiskSpec($capacityInKB, $unitNumber, $isHdd, $name)
+                    'device' => $this->data->addVirtualDiskSpec($capacityInKB, $unitNumber, $isHdd, $name),
                 ],
             ],
         ];
@@ -144,7 +144,7 @@ trait SoapVmApis
                 'deviceChange' => [
                     '@type' => 'VirtualDeviceConfigSpec',
                     'operation' => 'edit',
-                    'device' => $this->data->editVirtualDiskSpec($params)
+                    'device' => $this->data->editVirtualDiskSpec($params),
                 ],
             ],
         ];
@@ -216,10 +216,10 @@ trait SoapVmApis
                 'bootOptions' => [
                     'bootDelay' => 5000,
                     'bootOrder' => [
-                        '@type' => 'VirtualMachineBootOptionsBootableCdromDevice'
-                    ]
+                        '@type' => 'VirtualMachineBootOptionsBootableCdromDevice',
+                    ],
                 ],
-            ]
+            ],
         ];
 
         return $this->reconfigVmTask($vmId, $body);
@@ -236,7 +236,7 @@ trait SoapVmApis
                 'bootOptions' => [
                     'bootDelay' => 0,
                 ],
-            ]
+            ],
         ];
 
         return $this->reconfigVmTask($vmId, $body);
@@ -247,12 +247,12 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => $clusterComputerResource,
-                'type' => 'ClusterComputeResource'
+                'type' => 'ClusterComputeResource',
             ],
             'vm' => [
                 '_' => $vmId,
                 'type' => 'VirtualMachine',
-            ]
+            ],
         ];
 
         return $this->soapClient->FindRulesForVm($body);
@@ -263,9 +263,9 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => $parentFolder,
-                'type' => 'Folder'
+                'type' => 'Folder',
             ],
-            'name' => $name
+            'name' => $name,
         ];
 
         return $this->soapClient->CreateFolder($body);
@@ -282,7 +282,7 @@ trait SoapVmApis
             'name' => $name,
             'description' => $description,
             'memory' => $memory,
-            'quiesce' => $quiesce
+            'quiesce' => $quiesce,
         ];
 
         return $this->vmRequest('CreateSnapshot_Task', $vmId, $body);

@@ -20,6 +20,7 @@ trait SoapTransform
 
                 if (array_key_exists('type', $value)) {
                     $data[$key] = new SoapVar($value['_'], null, $value['type'], '', '', '');
+
                     continue;
                 }
 
@@ -48,11 +49,9 @@ trait SoapTransform
                     continue;
                 }
 
-
-
                 $data[$key] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, 'empty');
                 $typeName = null;
-            } elseif (!is_null($value)) {
+            } elseif (! is_null($value)) {
                 $data[$key] = $value;
             }
         }
