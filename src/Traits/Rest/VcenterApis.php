@@ -1,6 +1,6 @@
 <?php
 
-namespace Xelon\VmWareClient\Traits;
+namespace Xelon\VmWareClient\Traits\Rest;
 
 use Xelon\VmWareClient\Requests\ApiRequest;
 

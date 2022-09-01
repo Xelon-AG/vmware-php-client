@@ -1,6 +1,6 @@
 <?php
 
-namespace Xelon\VmWareClient\Traits;
+namespace Xelon\VmWareClient\Traits\Rest;
 
 use Xelon\VmWareClient\Requests\ApiRequest;
 
@@ -33,24 +33,24 @@ trait VmApis
         // TODO:
     }
 
-    public function resetPower()
+    public function resetPower(string $vmId)
     {
-        // TODO:
+        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=reset");
     }
 
-    public function startPower()
+    public function startPower(string $vmId)
     {
-        // TODO:
+        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=start");
     }
 
-    public function stopPower()
+    public function stopPower(string $vmId)
     {
-        // TODO:
+        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=stop");
     }
 
-    public function suspendPower()
+    public function suspendPower(string $vmId)
     {
-        // TODO:
+        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=suspend");
     }
 
     public function getTools()
@@ -305,9 +305,9 @@ trait VmApis
         // TODO:
     }
 
-    public function deleteHardwareDisk()
+    public function deleteHardwareDisk(string $vmId, int $diskKey)
     {
-        // TODO:
+        return $this->request('delete', "/api/vcenter/vm/$vmId/hardware/disk/$diskKey");
     }
 
     public function listHardwareEthernet()
@@ -330,9 +330,9 @@ trait VmApis
         // TODO:
     }
 
-    public function deleteHardwareEthernet()
+    public function deleteHardwareEthernet(string $vmId, int $nicKey)
     {
-        // TODO:
+        return $this->request('delete', "/api/vcenter/vm/$vmId/hardware/ethernet/$nicKey");
     }
 
     public function connectHardwareEthernet()
