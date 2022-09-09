@@ -4,7 +4,7 @@ namespace Xelon\VmWareClient\Data;
 
 class SoapData
 {
-    public function findVmBody(string $vmId, string $pathSet = ''): array
+    public function objectInfoBody(string $objectId, string $objectType, string $pathSet = ''): array
     {
         return [
             '_this' => [
@@ -13,14 +13,14 @@ class SoapData
             ],
             'specSet' => [
                 'propSet' => [
-                    'type' => 'VirtualMachine',
+                    'type' => $objectType,
                     'all' => !$pathSet,
                     'pathSet' => $pathSet
                 ],
                 'objectSet' => [
                     'obj' => [
-                        '_' => $vmId,
-                        'type' => 'VirtualMachine'
+                        '_' => $objectId,
+                        'type' => $objectType
                     ]
                 ]
             ]

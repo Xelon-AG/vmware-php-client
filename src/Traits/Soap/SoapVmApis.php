@@ -10,27 +10,9 @@ trait SoapVmApis
     use SoapRequest;
     use SoapTransform;
 
-    public function getVmInfo(string $vmId, string $pathSet = '')
+    public function getObjectInfo(string $objectId, string $objectType, string $pathSet = '')
     {
-        $body = [
-            '_this' => [
-                '_' => 'propertyCollector',
-                'type' => 'PropertyCollector'
-            ],
-            'specSet' => [
-                'propSet' => [
-                    'type' => 'VirtualMachine',
-                    'all' => !$pathSet,
-                    'pathSet' => $pathSet
-                ],
-                'objectSet' => [
-                    'obj' => [
-                        '_' => $vmId,
-                        'type' => 'VirtualMachine'
-                    ]
-                ]
-            ]
-        ];
+        $body = $this->data->objectInfoBody($objectId, $objectType, $pathSet);
 
         $result = $this->soapClient->RetrieveProperties($body);
 
@@ -39,33 +21,34 @@ trait SoapVmApis
             : $this->transformPropSet($result->returnval->propSet);
     }
 
+    public function getVmInfo(string $vmId, string $pathSet = '')
+    {
+        return $this->getObjectInfo($vmId, 'VirtualMachine', $pathSet);
+    }
+
     public function getTaskInfo(string $taskId, string $pathSet = '')
     {
-        $body = [
-            '_this' => [
-                '_' => 'propertyCollector',
-                'type' => 'PropertyCollector'
-            ],
-            'specSet' => [
-                'propSet' => [
-                    'type' => 'Task',
-                    'all' => !$pathSet,
-                    'pathSet' => $pathSet
-                ],
-                'objectSet' => [
-                    'obj' => [
-                        '_' => $taskId,
-                        'type' => 'Task'
-                    ]
-                ]
-            ]
-        ];
+        return $this->getObjectInfo($taskId, 'Task', $pathSet);
+    }
 
-        $result = $this->soapClient->RetrieveProperties($body);
+    public function getClusterComputeResourceInfo(string $clusterComputeResourceId, string $pathSet = '')
+    {
+        return $this->getObjectInfo($clusterComputeResourceId, 'ClusterComputeResource', $pathSet);
+    }
 
-        return $pathSet
-            ? ($result->returnval->propSet->val ?? null)
-            : $this->transformPropSet($result->returnval->propSet);
+    public function getDatastoreInfo(string $datastore, string $pathSet = '')
+    {
+        return $this->getObjectInfo($datastore, 'Datastore', $pathSet);
+    }
+
+    public function getSnapshotInfo(string $taskId, string $pathSet = '')
+    {
+        return $this->getObjectInfo($taskId, 'VirtualMachineSnapshot', $pathSet);
+    }
+
+    public function getTaskHistoryCollectorInfo(string $taskHistoryCollectorId)
+    {
+        return $this->getObjectInfo($taskHistoryCollectorId, 'TaskHistoryCollector');
     }
 
     public function reconfigVmTask(string $vmId, array $requestBody)
@@ -286,5 +269,61 @@ trait SoapVmApis
         ];
 
         return $this->vmRequest('CreateSnapshot_Task', $vmId, $body);
+    }
+
+    public function revertSnapshot(string $snapshopId)
+    {
+        $body = [
+            '_this' => [
+                '_' => $snapshopId,
+                'type' => 'VirtualMachineSnapshot'
+            ],
+        ];
+
+        return $this->soapClient->RevertToSnapshot_Task($body);
+    }
+
+    public function removeSnapshot(string $snapshopId, bool $removeChildren = true, bool $consolidate = true)
+    {
+        $body = [
+            '_this' => [
+                '_' => $snapshopId,
+                'type' => 'VirtualMachineSnapshot'
+            ],
+            'removeChildren' => $removeChildren,
+            '$consolidate' => $consolidate
+        ];
+
+        return $this->soapClient->RemoveSnapshot_Task($body);
+    }
+
+    public function queryPerf(
+        string $vmId,
+        ?string $startTime = null,
+        ?string $endTime = null,
+        int $intervalId = 20,
+        ?int $maxSample = null,
+        array $metricIds = []
+    ) {
+        $body = [
+            '_this' => [
+                '_' => 'PerfMgr',
+                'type' => 'PerformanceManager'
+            ],
+            'querySpec' => [
+                'entity' => [
+                    '_' => $vmId,
+                    'type' => 'VirtualMachine'
+                ],
+                'startTime' => $startTime,
+                'endTime' => $endTime,
+                'maxSample' => $maxSample,
+                'metricId' => array_map(fn(int $id): array => ['counterId' => $id, 'instance' => ''], $metricIds),
+                'intervalId' => $intervalId,
+                'format' => 'normal'
+            ]
+        ];
+
+        return $this->soapClient->QueryPerf($body);
     }
 }

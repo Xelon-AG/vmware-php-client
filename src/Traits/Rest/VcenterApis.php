@@ -13,9 +13,10 @@ trait VcenterApis
         // TODO:
     }
 
-    public function getVmList()
+    public function getVmList(array $requestBody)
     {
-        return $this->request('get', '/api/vcenter/vm');
+        $query = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($requestBody, null, '&'));
+        return $this->request('get', '/api/vcenter/vm', ['query' => $query]);
     }
 
     public function getVmInfo(string $vmId)
@@ -23,14 +24,14 @@ trait VcenterApis
         return $this->request('get', "/api/vcenter/vm/$vmId");
     }
 
-    public function deleteVm()
+    public function deleteVm(string $vmId)
     {
-        // TODO:
+        return $this->request('delete', "/api/vcenter/vm/$vmId");
     }
 
     public function cloneVm(array $requestBody)
     {
-        return $this->request('post', '/api/vcenter/vm?action=clone', ['body' => $requestBody]);
+        return $this->request('post', '/api/vcenter/vm?action=clone', ['json' => $requestBody]);
     }
 
     public function registerVm()

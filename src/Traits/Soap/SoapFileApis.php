@@ -16,19 +16,19 @@ trait SoapFileApis
         string $username,
         string $password,
         string $vmId,
-        ?string $scriptPath,
+        ?string $localFilePath,
         string $guestFilePath,
         array $params = [],
-        string $script = null
+        string $data = null
     ): void {
-        if ($scriptPath) {
-            $fullScriptPath = base_path($scriptPath);
-            $script = file_get_contents($fullScriptPath);
+        if ($localFilePath) {
+            $fullScriptPath = base_path($localFilePath);
+            $data = file_get_contents($fullScriptPath);
         }
 
         if (count($params) > 0) {
             foreach ($params as $key => $value) {
-                $script = str_replace('{'.$key.'}', $value, $script);
+                $data = str_replace('{'.$key.'}', $value, $data);
             }
         }
 
@@ -43,13 +43,13 @@ trait SoapFileApis
             ],
             'auth' => [
                 '@type' => 'NamePasswordAuthentication',
-                'interactiveSession' => true,
+                'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password
             ],
             'guestFilePath' => "{$guestFilePath}",
             'fileAttributes' => new \stdClass(),
-            'fileSize' => strlen($script),
+            'fileSize' => strlen($data),
             'overwrite' => true
         ];
 
@@ -61,7 +61,7 @@ trait SoapFileApis
             if (is_string($response->returnval) && substr($response->returnval, 0, 4) !== 'http') {
                 throw new Exception('File transfer invalid response url');
             }
-            $client->request('PUT', $response->returnval, ['body' => $script]);
+            $client->request('PUT', $response->returnval, ['body' => $data]);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -155,5 +155,38 @@ trait SoapFileApis
         ];
 
         return $this->soapClient->StartProgramInGuest($this->arrayToSoapVar($body));
+    }
+
+    public function createTaskCollectorForVm(string $vmId)
+    {
+        $body = [
+            '_this' => [
+                '_' => 'TaskManager',
+                'type' => 'TaskManager'
+            ],
+            'filter' => [
+                'entity' => [
+                    'entity' => [
+                        'type' => 'VirtualMachine',
+                        '_' => $vmId
+                    ],
+                    'recursion' => 'self'
+                ]
+            ]
+        ];
+
+        return $this->soapClient->CreateCollectorForTasks($body);
+    }
+
+    public function destroyTaskCollector(string $taskCollectorId)
+    {
+        $body = [
+          '_this' => [
+              'type' => 'HistoryCollector',
+              '_' => $taskCollectorId
+          ]
+        ];
+
+        return $this->soapClient->DestroyCollector($body);
     }
 }
