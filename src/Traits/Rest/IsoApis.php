@@ -12,7 +12,7 @@ trait IsoApis
     {
         return $this->request('post', '/api/vcenter/iso/image?action=mount', ['form_params' => [
             'library_item' => $libraryItem,
-            'vm' => $vmId
+            'vm' => $vmId,
         ]]);
     }
 
@@ -20,7 +20,7 @@ trait IsoApis
     {
         return $this->request('post', '/api/vcenter/iso/image?action=unmount', ['form_params' => [
             'cdrom' => $cdRom,
-            'vm' => $vmId
+            'vm' => $vmId,
         ]]);
     }
 }

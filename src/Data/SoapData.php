@@ -9,18 +9,18 @@ class SoapData
         return [
             '_this' => [
                 '_' => 'propertyCollector',
-                'type' => 'PropertyCollector'
+                'type' => 'PropertyCollector',
             ],
             'specSet' => [
                 'propSet' => [
                     'type' => $objectType,
                     'all' => !$pathSet,
-                    'pathSet' => $pathSet
+                    'pathSet' => $pathSet,
                 ],
                 'objectSet' => [
                     'obj' => [
                         '_' => $objectId,
-                        'type' => $objectType
+                        'type' => $objectType,
                     ]
                 ]
             ]
@@ -59,7 +59,7 @@ class SoapData
                     'shares' => 1000,
                     'level' => 'normal',
                 ],
-            ]
+            ],
         ];
     }
 
@@ -97,7 +97,7 @@ class SoapData
                 'port' => [
                     'switchUuid' => $switchUuid,
                     'portgroupKey' => $portgroupKey,
-                ]
+                ],
             ],
             'controllerKey' => $controllerKey,
             'unitNumber' => $unitNumber,
@@ -118,7 +118,7 @@ class SoapData
                 'port' => [
                     'switchUuid' => $switchUuid,
                     'portgroupKey' => $portgroupKey,
-                ]
+                ],
             ],
             'addressType' => 'generated',
             'macAddress' => $macAddress,
@@ -137,7 +137,7 @@ class SoapData
             '@type' => 'VirtualLsiLogicSASController',
             'busNumber' => 1,
             'hotAddRemove' => true,
-            'sharedBus' => 'physicalSharing'
+            'sharedBus' => 'physicalSharing',
         ];
     }
 
@@ -151,7 +151,7 @@ class SoapData
                 'fileName' => $fileName,
                 'datastore' => [
                     'type' => 'Datastore',
-                    '_' => $datastore
+                    '_' => $datastore,
                 ],
             ],
             'connectable' => [
@@ -186,11 +186,11 @@ class SoapData
         return [
             'adapter' => [
                 '@type' => 'CustomizationFixedIp',
-                'ipAddress' => $ip
+                'ipAddress' => $ip,
             ],
             'subnetMask' => $subnetMask,
             'dnsServerList' => $dnsServerList,
-            'gateway' => $gateway
+            'gateway' => $gateway,
 
         ];
     }
@@ -202,25 +202,25 @@ class SoapData
             'guiUnattended' => [
                 'password' => [
                     'plainText' => true,
-                    'value' => $password
+                    'value' => $password,
                 ],
                 'timeZone' => 110,
                 'autoLogon' => true,
-                'autoLogonCount' => 1
+                'autoLogonCount' => 1,
             ],
             'userData' => [
                 'fullName' => $name,
                 'orgName' => $name,
                 'computerName' => [
                     '@type' => 'CustomizationFixedName',
-                    'name' => $hostname
+                    'name' => $hostname,
                 ],
-                'productId' => $license
+                'productId' => $license,
 
             ],
             'identification' => [
-                'joinWorkgroup' => 'workgroup'
-            ]
+                'joinWorkgroup' => 'workgroup',
+            ],
         ];
     }
 }
