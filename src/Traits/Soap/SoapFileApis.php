@@ -171,8 +171,8 @@ trait SoapFileApis
                         '_' => $vmId,
                     ],
                     'recursion' => 'self',
-                ]
-            ]
+                ],
+            ],
         ];
 
         return $this->soapClient->CreateCollectorForTasks($body);
@@ -181,10 +181,10 @@ trait SoapFileApis
     public function destroyTaskCollector(string $taskCollectorId)
     {
         $body = [
-          '_this' => [
-              'type' => 'HistoryCollector',
-              '_' => $taskCollectorId
-          ]
+            '_this' => [
+                'type' => 'HistoryCollector',
+                '_' => $taskCollectorId,
+            ],
         ];
 
         return $this->soapClient->DestroyCollector($body);

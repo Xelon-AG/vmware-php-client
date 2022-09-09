@@ -14,16 +14,16 @@ class SoapData
             'specSet' => [
                 'propSet' => [
                     'type' => $objectType,
-                    'all' => !$pathSet,
+                    'all' => ! $pathSet,
                     'pathSet' => $pathSet,
                 ],
                 'objectSet' => [
                     'obj' => [
                         '_' => $objectId,
                         'type' => $objectType,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 

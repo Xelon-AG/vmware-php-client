@@ -276,7 +276,7 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => $snapshopId,
-                'type' => 'VirtualMachineSnapshot'
+                'type' => 'VirtualMachineSnapshot',
             ],
         ];
 
@@ -288,10 +288,10 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => $snapshopId,
-                'type' => 'VirtualMachineSnapshot'
+                'type' => 'VirtualMachineSnapshot',
             ],
             'removeChildren' => $removeChildren,
-            '$consolidate' => $consolidate
+            '$consolidate' => $consolidate,
         ];
 
         return $this->soapClient->RemoveSnapshot_Task($body);
@@ -308,20 +308,20 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => 'PerfMgr',
-                'type' => 'PerformanceManager'
+                'type' => 'PerformanceManager',
             ],
             'querySpec' => [
                 'entity' => [
                     '_' => $vmId,
-                    'type' => 'VirtualMachine'
+                    'type' => 'VirtualMachine',
                 ],
                 'startTime' => $startTime,
                 'endTime' => $endTime,
                 'maxSample' => $maxSample,
-                'metricId' => array_map(fn(int $id): array => ['counterId' => $id, 'instance' => ''], $metricIds),
+                'metricId' => array_map(fn (int $id): array => ['counterId' => $id, 'instance' => ''], $metricIds),
                 'intervalId' => $intervalId,
-                'format' => 'normal'
-            ]
+                'format' => 'normal',
+            ],
         ];
 
         return $this->soapClient->QueryPerf($body);
