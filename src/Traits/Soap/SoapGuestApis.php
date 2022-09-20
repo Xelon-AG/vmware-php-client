@@ -7,7 +7,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
 
-trait SoapFileApis
+trait SoapGuestApis
 {
     use SoapRequest;
     use SoapTransform;
@@ -126,6 +126,33 @@ trait SoapFileApis
         return $this->soapClient->DeleteDirectoryInGuest($this->arrayToSoapVar($body));
     }
 
+    public function deleteFileInGuest(
+        string $username,
+        string $password,
+        string $vmId,
+        string $filePath
+    ) {
+        $body = [
+            '_this' => [
+                'type' => 'GuestFileManager',
+                '_' => 'guestOperationsFileManager',
+            ],
+            'vm' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+            'auth' => [
+                '@type' => 'NamePasswordAuthentication',
+                'interactiveSession' => false,
+                'username' => $username,
+                'password' => $password,
+            ],
+            'filePath' => $filePath,
+        ];
+
+        return $this->soapClient->DeleteFileInGuest($this->arrayToSoapVar($body));
+    }
+
     public function startProgramInGuest(
         string $username,
         string $password,
@@ -188,5 +215,79 @@ trait SoapFileApis
         ];
 
         return $this->soapClient->DestroyCollector($body);
+    }
+
+    public function getListFilesInGuest(
+        string $username,
+        string $password,
+        string $vmId,
+        string $filePath
+    ) {
+        $body = [
+            '_this' => [
+                'type' => 'GuestFileManager',
+                '_' => 'guestOperationsFileManager',
+            ],
+            'vm' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+            'auth' => [
+                '@type' => 'NamePasswordAuthentication',
+                'interactiveSession' => false,
+                'username' => $username,
+                'password' => $password,
+            ],
+            'filePath' => $filePath,
+        ];
+
+        return $this->soapClient->ListFilesInGuest($this->arrayToSoapVar($body));
+    }
+
+    public function getListProcessInGuest(
+        string $username,
+        string $password,
+        string $vmId
+    ) {
+        $body = [
+            '_this' => [
+                'type' => 'GuestFileManager',
+                '_' => 'guestOperationsFileManager',
+            ],
+            'vm' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+            'auth' => [
+                '@type' => 'NamePasswordAuthentication',
+                'interactiveSession' => false,
+                'username' => $username,
+                'password' => $password,
+            ],
+        ];
+
+        return $this->soapClient->ListProcessesInGuest($this->arrayToSoapVar($body));
+    }
+
+    public function validateCredentialsInGuest(string $username, string $password, string $vmId)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'GuestAuthManager',
+                '_' => 'guestOperationsAuthManager',
+            ],
+            'vm' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+            'auth' => [
+                '@type' => 'NamePasswordAuthentication',
+                'interactiveSession' => false,
+                'username' => $username,
+                'password' => $password,
+            ],
+        ];
+
+        return $this->soapClient->ValidateCredentialsInGuest($this->arrayToSoapVar($body));
     }
 }

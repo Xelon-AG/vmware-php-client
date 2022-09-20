@@ -51,6 +51,20 @@ trait SoapVmApis
         return $this->getObjectInfo($taskHistoryCollectorId, 'TaskHistoryCollector');
     }
 
+    public function getResourcePoolInfo(?string $resourcePoolId, string $pathSet = '')
+    {
+        if (!$resourcePoolId) {
+            return [];
+        }
+
+        return $this->getObjectInfo($resourcePoolId, 'ResourcePool', $pathSet);
+    }
+
+    public function getDistributedVirtualPortgroupInfo(string $distributedVirtualPortgroupId, string $pathSet = '')
+    {
+        return $this->getObjectInfo($distributedVirtualPortgroupId, 'DistributedVirtualPortgroup', $pathSet);
+    }
+
     public function reconfigVmTask(string $vmId, array $requestBody)
     {
         return $this->vmRequest('ReconfigVM_Task', $vmId, $this->arrayToSoapVar($requestBody));
@@ -76,12 +90,14 @@ trait SoapVmApis
                     ],
                 ],
                 'template' => $params['spec']['template'] ?? false,
-                'config' => [
-                    'numCPUs' => $params['spec']['config']['numCPUs'],
-                    'numCoresPerSocket' => $params['spec']['config']['numCoresPerSocket'],
-                    'memoryMB' => $params['spec']['config']['memoryMB'],
-                    'deviceChange' => $params['spec']['config']['deviceChange'] ?? null,
-                ],
+                'config' => isset($params['spec']['config'])
+                    ? [
+                        'numCPUs' => $params['spec']['config']['numCPUs'],
+                        'numCoresPerSocket' => $params['spec']['config']['numCoresPerSocket'],
+                        'memoryMB' => $params['spec']['config']['memoryMB'],
+                        'deviceChange' => $params['spec']['config']['deviceChange'] ?? null,
+                    ]
+                    : null,
                 'customization' => $params['spec']['customization'] ?? null,
                 'powerOn' => $params['spec']['powerOn'] ?? true,
                 /*'bootOptions' => [
@@ -135,6 +151,22 @@ trait SoapVmApis
         return $this->reconfigVmTask($vmId, $body);
     }
 
+    public function addPersistantDisk(string $vmId, string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000)
+    {
+        $body = [
+            'spec' => [
+                '@type' => 'VirtualMachineConfigSpec',
+                'deviceChange' => [
+                    '@type' => 'VirtualDeviceConfigSpec',
+                    'operation' => 'add',
+                    'device' => $this->data->addBlockStorageSpec($blockStoragePath, $capacityInKB, $controllerKey),
+                ],
+            ],
+        ];
+
+        return $this->reconfigVmTask($vmId, $this->arrayToSoapVar($body));
+    }
+
     public function addNetwork(string $vmId, int $unitNumber, string $portgroupKey, string $switchUuid)
     {
         $body = [
@@ -186,6 +218,111 @@ trait SoapVmApis
         ];
 
         return $this->reconfigVmTask($vmId, $body);
+    }
+
+    public function changeDVPortgroupSpeed(
+        string $distributedVirtualPortgroupId,
+        string $configVersion,
+        int $speed
+    ) {
+        $body = [
+            '_this' => [
+                '_' => $distributedVirtualPortgroupId,
+                'type' => 'DistributedVirtualPortgroup',
+            ],
+            'spec' => [
+                '@type' => 'DVPortgroupConfigSpec',
+                'configVersion' => $configVersion,
+                'defaultPortConfig' => [
+                    '@type' => 'DVPortSetting',
+                    'inShapingPolicy' => [
+                        '@type' => 'DVSTrafficShapingPolicy',
+                        'inherited' => false,
+                        'enabled' => [
+                            'inherited' => false,
+                            'value' => true,
+                        ],
+                        'averageBandwidth' => [
+                            'inherited' => false,
+                            'value' => $speed,
+                        ],
+                        'peakBandwidth' => [
+                            'inherited' => false,
+                            'value' => $speed,
+                        ],
+                        'burstSize' => [
+                            'inherited' => false,
+                            'value' => $speed,
+                        ]
+                    ],
+                    'outShapingPolicy' => [
+                        '@type' => 'DVSTrafficShapingPolicy',
+                        'inherited' => false,
+                        'enabled' => [
+                            'inherited' => false,
+                            'value' => true,
+                        ],
+                        'averageBandwidth' => [
+                            'inherited' => false,
+                            'value' => $speed,
+                        ],
+                        'peakBandwidth' => [
+                            'inherited' => false,
+                            'value' => $speed,
+                        ],
+                        'burstSize' => [
+                            'inherited' => false,
+                            'value' => $speed,
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return $this->soapClient->ReconfigureDVPortgroup_Task($this->arrayToSoapVar($body));
+    }
+
+    public function reconfigureComputeResource(
+        string $clusterComputerResourceId,
+        string $name,
+        array $vmIds
+    ) {
+        $body = [
+            '_this' => [
+                '_' => $clusterComputerResourceId,
+                'type' => 'ComputeResource'
+            ],
+            'spec' => [
+                '@type' => 'ClusterConfigSpecEx',
+                'drsConfig' => [
+                    '@type' => 'ClusterDrsConfigInfo'
+                ],
+                'rulesSpec' => [
+                    '@type' => 'ClusterRuleSpec',
+                    'operation' => 'add',
+                    'info' => [
+                        '@type' => 'ClusterAntiAffinityRuleSpec',
+                        'enabled' => true,
+                        'name' => $name,
+                        'userCreated' => true,
+                    ]
+                ],
+                'dpmConfig' => [
+                    '@type' => 'ClusterDpmConfigInfo'
+                ]
+
+            ],
+            'modify' => false
+        ];
+
+        foreach ($vmIds as $vmId) {
+            $body['spec']['rulesSpec']['info']['vm'][] = [
+                '_' => $vmId,
+                'type' => 'VirtualMachine'
+            ];
+        }
+
+        return $this->soapClient->ReconfigureComputeResource_Task($this->arrayToSoapVar($body));
     }
 
     public function mountIso(string $vmId, string $fileName, int $key, int $controllerKey, string $datastore)
@@ -254,6 +391,18 @@ trait SoapVmApis
         return $this->soapClient->CreateFolder($body);
     }
 
+    public function deleteFolder(string $folderId)
+    {
+        $body = [
+            '_this' => [
+                '_' => $folderId,
+                'type' => 'Folder',
+            ],
+        ];
+
+        return $this->soapClient->Destroy_Task($body);
+    }
+
     public function createSnapshot(
         string $vmId,
         string $name,
@@ -298,12 +447,13 @@ trait SoapVmApis
     }
 
     public function queryPerf(
-        string $vmId,
+        string $objectId,
         ?string $startTime = null,
         ?string $endTime = null,
         int $intervalId = 20,
         ?int $maxSample = null,
-        array $metricIds = []
+        array $metricIds = [],
+        string $entity = 'VirtualMachine'
     ) {
         $body = [
             '_this' => [
@@ -312,8 +462,8 @@ trait SoapVmApis
             ],
             'querySpec' => [
                 'entity' => [
-                    '_' => $vmId,
-                    'type' => 'VirtualMachine',
+                    '_' => $objectId,
+                    'type' => $entity,
                 ],
                 'startTime' => $startTime,
                 'endTime' => $endTime,
@@ -321,9 +471,24 @@ trait SoapVmApis
                 'metricId' => array_map(fn (int $id): array => ['counterId' => $id, 'instance' => ''], $metricIds),
                 'intervalId' => $intervalId,
                 'format' => 'normal',
-            ],
+            ]
         ];
 
         return $this->soapClient->QueryPerf($body);
+    }
+
+    public function acquireTicket(string $vmId, string $ticketType = 'webmks')
+    {
+        return $this->vmRequest('AcquireTicket', $vmId, ['ticketType' => $ticketType]);
+    }
+
+    public function mountToolsInstaller(string $vmId)
+    {
+        return $this->vmRequest('MountToolsInstaller', $vmId);
+    }
+
+    public function unmountToolsInstaller(string $vmId)
+    {
+        return $this->vmRequest('UnmountToolsInstaller', $vmId);
     }
 }

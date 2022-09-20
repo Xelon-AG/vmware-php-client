@@ -82,6 +82,22 @@ class SoapData
         ];
     }
 
+    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000)
+    {
+        return [
+            '@type' => 'VirtualDisk',
+            'key' => -1,
+            'backing' => [
+                '@type' => 'VirtualDiskFlatVer2BackingInfo',
+                'fileName' => $blockStoragePath,
+                'diskMode' => 'independent_persistent',
+            ],
+            'controllerKey' => $controllerKey,
+            'unitNumber' => -1,
+            'capacityInKB' => $capacityInKB,
+        ];
+    }
+
     public function addNetworkSpec(
         string $switchUuid,
         string $portgroupKey,
