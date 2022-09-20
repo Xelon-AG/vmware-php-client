@@ -41,7 +41,7 @@ trait SoapTransform
                     $arrayData = [];
 
                     foreach ($value as $item) {
-                        $arrayData[] = new SoapVar($this->arrayToSoapVar($item), SOAP_ENC_OBJECT, null, 'vm', null);;
+                        $arrayData[] = new SoapVar($this->arrayToSoapVar($item), SOAP_ENC_OBJECT, null, 'vm', null);
                     }
 
                     $data[$key] = $arrayData;

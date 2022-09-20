@@ -22,7 +22,7 @@ trait SoapStorageApis
             ],
             'datastore' => [
                 'type' => 'Datastore',
-                '_' => $datastore
+                '_' => $datastore,
             ],
         ];
 
@@ -41,7 +41,7 @@ trait SoapStorageApis
             ],
             'datastore' => [
                 'type' => 'Datastore',
-                '_' => $datastore
+                '_' => $datastore,
             ],
         ];
 
@@ -62,11 +62,11 @@ trait SoapStorageApis
                     '@type' => 'VslmCreateSpecDiskFileBackingSpec',
                     'datastore' => [
                         'type' => 'Datastore',
-                        '_' => $datastore
+                        '_' => $datastore,
                     ],
                 ],
                 'capacityInMB' => $capacityInMB,
-            ]
+            ],
         ];
 
         return $this->soapClient->CreateDisk_Task($this->arrayToSoapVar($body));
@@ -84,7 +84,7 @@ trait SoapStorageApis
             ],
             'datastore' => [
                 'type' => 'Datastore',
-                '_' => $datastore
+                '_' => $datastore,
             ],
             'newCapacityInMB' => $newCapacityInMB,
         ];

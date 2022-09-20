@@ -53,7 +53,7 @@ trait SoapVmApis
 
     public function getResourcePoolInfo(?string $resourcePoolId, string $pathSet = '')
     {
-        if (!$resourcePoolId) {
+        if (! $resourcePoolId) {
             return [];
         }
 
@@ -253,7 +253,7 @@ trait SoapVmApis
                         'burstSize' => [
                             'inherited' => false,
                             'value' => $speed,
-                        ]
+                        ],
                     ],
                     'outShapingPolicy' => [
                         '@type' => 'DVSTrafficShapingPolicy',
@@ -273,10 +273,10 @@ trait SoapVmApis
                         'burstSize' => [
                             'inherited' => false,
                             'value' => $speed,
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         return $this->soapClient->ReconfigureDVPortgroup_Task($this->arrayToSoapVar($body));
@@ -290,12 +290,12 @@ trait SoapVmApis
         $body = [
             '_this' => [
                 '_' => $clusterComputerResourceId,
-                'type' => 'ComputeResource'
+                'type' => 'ComputeResource',
             ],
             'spec' => [
                 '@type' => 'ClusterConfigSpecEx',
                 'drsConfig' => [
-                    '@type' => 'ClusterDrsConfigInfo'
+                    '@type' => 'ClusterDrsConfigInfo',
                 ],
                 'rulesSpec' => [
                     '@type' => 'ClusterRuleSpec',
@@ -305,20 +305,20 @@ trait SoapVmApis
                         'enabled' => true,
                         'name' => $name,
                         'userCreated' => true,
-                    ]
+                    ],
                 ],
                 'dpmConfig' => [
-                    '@type' => 'ClusterDpmConfigInfo'
-                ]
+                    '@type' => 'ClusterDpmConfigInfo',
+                ],
 
             ],
-            'modify' => false
+            'modify' => false,
         ];
 
         foreach ($vmIds as $vmId) {
             $body['spec']['rulesSpec']['info']['vm'][] = [
                 '_' => $vmId,
-                'type' => 'VirtualMachine'
+                'type' => 'VirtualMachine',
             ];
         }
 
@@ -471,7 +471,7 @@ trait SoapVmApis
                 'metricId' => array_map(fn (int $id): array => ['counterId' => $id, 'instance' => ''], $metricIds),
                 'intervalId' => $intervalId,
                 'format' => 'normal',
-            ]
+            ],
         ];
 
         return $this->soapClient->QueryPerf($body);
