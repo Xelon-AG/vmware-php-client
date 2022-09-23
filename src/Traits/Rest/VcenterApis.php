@@ -13,7 +13,7 @@ trait VcenterApis
         // TODO:
     }
 
-    public function getVmList(array $requestBody)
+    public function getVmList(array $requestBody = [])
     {
         $query = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($requestBody, null, '&'));
 
@@ -53,5 +53,12 @@ trait VcenterApis
     public function unregisterVm()
     {
         // TODO:
+    }
+
+    public function getNetworkList(array $requestBody = [])
+    {
+        $query = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($requestBody, null, '&'));
+
+        return $this->request('get', '/api/vcenter/network', ['query' => $query]);
     }
 }

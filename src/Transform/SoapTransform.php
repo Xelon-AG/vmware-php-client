@@ -19,37 +19,37 @@ trait SoapTransform
                 }
 
                 if (array_key_exists('type', $value)) {
-                    $data[$key] = new SoapVar($value['_'], null, $value['type'], '', '', '');
+                    $data[$key] = new SoapVar($value['_'], null, $value['type'], '', $key, '');
 
                     continue;
                 }
 
-                // TODO: Get rid of BOGUS and ENV:Struct tags
-                /*if (array_key_exists(0, $value)) {
-                    $arrayData = [];
+                if (is_array($value) && array_key_exists(0, $value)) {
+                    foreach ($value as $childItem) {
 
-                    foreach ($value as $item) {
-                        $arrayData[] = new SoapVar($this->arrayToSoapVar($item), SOAP_ENC_OBJECT, $typeName, 'VirtualDeviceConfigSpec', 'deviceChange', '');
+                        if (array_key_exists('@type', $childItem)) {
+                            $typeName = $childItem['@type'];
+                            unset($childItem['@type']);
+                        }
+
+                        if (array_key_exists('type', $childItem)) {
+                            $data[] = new SoapVar($childItem['_'], null, $childItem['type'], '', $key, '');
+
+                            continue;
+                        }
+
+                        $data[] = new SoapVar($this->arrayToSoapVar($childItem), SOAP_ENC_OBJECT, $typeName, null);
                     }
 
-                    $data[$key] = new SoapVar($arrayData, SOAP_ENC_OBJECT, '', '', 'deviceChanges', '');
+                    unset($array[$key]);
 
-                    continue;
-                }*/
-
-                if (array_key_exists(0, $value)) {
-                    $arrayData = [];
-
-                    foreach ($value as $item) {
-                        $arrayData[] = new SoapVar($this->arrayToSoapVar($item), SOAP_ENC_OBJECT, null, 'vm', null);
-                    }
-
-                    $data[$key] = $arrayData;
-
-                    continue;
+                    $deepArraySet = true;
                 }
 
-                $data[$key] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, 'empty');
+                if (!isset($deepArraySet)) {
+                    $data[$key] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, $key);
+                }
+
                 $typeName = null;
             } elseif (! is_null($value)) {
                 $data[$key] = $value;

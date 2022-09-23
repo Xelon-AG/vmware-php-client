@@ -2,7 +2,9 @@
 
 namespace Xelon\VmWareClient;
 
+use Xelon\VmWareClient\Traits\Rest\CisApis;
 use Xelon\VmWareClient\Traits\Rest\IsoApis;
+use Xelon\VmWareClient\Traits\Rest\OfvApis;
 use Xelon\VmWareClient\Traits\Rest\VcenterApis;
 use Xelon\VmWareClient\Traits\Rest\VmApis;
 
@@ -11,6 +13,8 @@ class VcenterClient extends VmWareClientInit
     use VcenterApis;
     use VmApis;
     use IsoApis;
+    use CisApis;
+    use OfvApis;
 
     public ?VcenterSoapClient $soap;
 

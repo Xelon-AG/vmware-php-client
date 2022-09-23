@@ -22,6 +22,7 @@ class SoapData
                         '_' => $objectId,
                         'type' => $objectType,
                     ],
+                    'skip' => false
                 ],
             ],
         ];
