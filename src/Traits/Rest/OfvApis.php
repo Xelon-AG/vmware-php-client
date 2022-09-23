@@ -30,14 +30,14 @@ trait OfvApis
                                 'category' => '',
                                 'type' => 'string',
                                 'value' => $data['user_data'],
-                                'ui_optional' => false
-                            ]
-                        ]
-                    ]
+                                'ui_optional' => false,
+                            ],
+                        ],
+                    ],
                 ],
                 'network_mappings' => [
                     'value' => $data['network_port_group'],
-                    'key' => 'VM Network'
+                    'key' => 'VM Network',
                 ],
             ],
             'target' => [
