@@ -474,7 +474,7 @@ trait SoapVmApis
             ],
         ];
 
-        return $this->soapClient->QueryPerf($body);
+        return $this->transformToArrayValues($this->soapClient->QueryPerf($body));
     }
 
     public function acquireTicket(string $vmId, string $ticketType = 'webmks')
