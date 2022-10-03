@@ -70,7 +70,7 @@ trait SoapTransform
     }
 
     /**
-     * @param stdClass $object
+     * @param  stdClass  $object
      * @return stdClass
      * This function transform to array objects that should be array type
      */
@@ -99,7 +99,7 @@ trait SoapTransform
             $newObj = $object;
 
             foreach ($path as $index => $property) {
-                if ($index < $startIndex || !is_object($newObj) || empty((array)$newObj) || !property_exists($newObj, $property)) {
+                if ($index < $startIndex || ! is_object($newObj) || empty((array) $newObj) || ! property_exists($newObj, $property)) {
                     continue;
                 }
 
@@ -109,7 +109,7 @@ trait SoapTransform
 
                 isset($$varName) ? $$varName = &$$varName->{$property} : $$varName = &$object->{$property};
 
-                if ($index === $lastIndex && !is_array($newObj)) {
+                if ($index === $lastIndex && ! is_array($newObj)) {
                     $$varName = [$$varName];
                 }
 
