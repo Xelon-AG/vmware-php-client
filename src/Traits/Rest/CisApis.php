@@ -12,14 +12,14 @@ trait CisApis
     {
         return $this->request(
             'post',
-            "/api/cis/tagging/tag-association?action=list-attached-tags",
+            '/api/cis/tagging/tag-association?action=list-attached-tags',
             [
                 'json' => [
-                    'object_id'=> [
-                        'type'=>'VirtualMachine',
-                        'id'=> $vmId
-                    ]
-                ]
+                    'object_id' => [
+                        'type' => 'VirtualMachine',
+                        'id' => $vmId,
+                    ],
+                ],
             ]
         );
     }
@@ -31,11 +31,11 @@ trait CisApis
             "/api/cis/tagging/tag-association/$tagId?action=attach",
             [
                 'json' => [
-                    'object_id'=> [
-                        'type'=>'VirtualMachine',
-                        'id'=> $vmId
-                    ]
-                ]
+                    'object_id' => [
+                        'type' => 'VirtualMachine',
+                        'id' => $vmId,
+                    ],
+                ],
             ]
         );
     }
@@ -47,11 +47,11 @@ trait CisApis
             "/api/cis/tagging/tag-association/$tagId?action=detach",
             [
                 'json' => [
-                    'object_id'=> [
-                        'type'=>'VirtualMachine',
-                        'id'=> $vmId
-                    ]
-                ]
+                    'object_id' => [
+                        'type' => 'VirtualMachine',
+                        'id' => $vmId,
+                    ],
+                ],
             ]
         );
     }

@@ -26,7 +26,6 @@ trait SoapTransform
 
                 if (is_array($value) && array_key_exists(0, $value)) {
                     foreach ($value as $childItem) {
-
                         if (array_key_exists('@type', $childItem)) {
                             $typeName = $childItem['@type'];
                             unset($childItem['@type']);
@@ -46,7 +45,7 @@ trait SoapTransform
                     $deepArraySet = true;
                 }
 
-                if (!isset($deepArraySet)) {
+                if (! isset($deepArraySet)) {
                     $data[$key] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, $key);
                 }
 
