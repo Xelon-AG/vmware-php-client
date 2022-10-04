@@ -53,7 +53,7 @@ trait SoapGuestApis
             'overwrite' => true,
         ];
 
-        $response = $this->soapClient->InitiateFileTransferToGuest($this->arrayToSoapVar($body));
+        $response = $this->request('InitiateFileTransferToGuest', $body);
 
         $client = new GuzzleClient(['verify' => false]);
 
@@ -95,7 +95,7 @@ trait SoapGuestApis
             'directoryPath' => $directoryPath,
         ];
 
-        return $this->soapClient->CreateTemporaryDirectoryInGuest($this->arrayToSoapVar($body));
+        return $this->request('CreateTemporaryDirectoryInGuest', $body);
     }
 
     public function deleteDirectoryInGuest(
@@ -123,7 +123,7 @@ trait SoapGuestApis
             'recursive' => true,
         ];
 
-        return $this->soapClient->DeleteDirectoryInGuest($this->arrayToSoapVar($body));
+        return $this->request('DeleteDirectoryInGuest', $body);
     }
 
     public function deleteFileInGuest(
@@ -150,7 +150,7 @@ trait SoapGuestApis
             'filePath' => $filePath,
         ];
 
-        return $this->soapClient->DeleteFileInGuest($this->arrayToSoapVar($body));
+        return $this->request('DeleteFileInGuest', $body);
     }
 
     public function startProgramInGuest(
@@ -181,7 +181,7 @@ trait SoapGuestApis
             ],
         ];
 
-        return $this->soapClient->StartProgramInGuest($this->arrayToSoapVar($body));
+        return $this->request('StartProgramInGuest', $body);
     }
 
     public function createTaskCollectorForVm(string $vmId)
@@ -202,7 +202,7 @@ trait SoapGuestApis
             ],
         ];
 
-        return $this->soapClient->CreateCollectorForTasks($body);
+        return $this->request('CreateCollectorForTasks', $body);
     }
 
     public function destroyTaskCollector(string $taskCollectorId)
@@ -214,7 +214,7 @@ trait SoapGuestApis
             ],
         ];
 
-        return $this->soapClient->DestroyCollector($body);
+        return $this->request('DestroyCollector', $body);
     }
 
     public function getListFilesInGuest(
@@ -241,7 +241,7 @@ trait SoapGuestApis
             'filePath' => $filePath,
         ];
 
-        return $this->soapClient->ListFilesInGuest($this->arrayToSoapVar($body));
+        return $this->request('ListFilesInGuest', $body);
     }
 
     public function getListProcessInGuest(
@@ -266,7 +266,7 @@ trait SoapGuestApis
             ],
         ];
 
-        return $this->soapClient->ListProcessesInGuest($this->arrayToSoapVar($body));
+        return $this->request('ListProcessesInGuest', $body);
     }
 
     public function validateCredentialsInGuest(string $username, string $password, string $vmId)
@@ -288,6 +288,6 @@ trait SoapGuestApis
             ],
         ];
 
-        return $this->soapClient->ValidateCredentialsInGuest($this->arrayToSoapVar($body));
+        return $this->request('ValidateCredentialsInGuest', $body);
     }
 }

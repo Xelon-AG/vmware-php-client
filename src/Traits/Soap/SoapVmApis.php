@@ -2,6 +2,7 @@
 
 namespace Xelon\VmWareClient\Traits\Soap;
 
+use Illuminate\Support\Facades\Log;
 use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
 
@@ -14,7 +15,20 @@ trait SoapVmApis
     {
         $body = $this->data->objectInfoBody($objectId, $objectType, $pathSet);
 
-        $result = $this->soapClient->RetrieveProperties($body);
+        try {
+            $result = $this->soapClient->RetrieveProperties($body);
+        } catch (\Exception $exception) {
+            Log::error(
+                "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
+                "\nSOAP request: ".$this->soapClient->__last_request.
+                "\nSOAP response: ".$this->soapClient->__last_response
+            );
+
+            if (array_keys(json_decode(json_encode($exception->detail), true))[0] === 'ManagedObjectNotFoundFault') {
+                Log::error("404 error, type: $objectType, object id: $objectId");
+                return new \stdClass();
+            }
+        }
 
         return $pathSet
             ? ($result->returnval->propSet->val ?? null)
@@ -279,7 +293,7 @@ trait SoapVmApis
             ],
         ];
 
-        return $this->soapClient->ReconfigureDVPortgroup_Task($this->arrayToSoapVar($body));
+        return $this->request('ReconfigureDVPortgroup_Task', $body);
     }
 
     public function reconfigureComputeResource(
@@ -322,7 +336,7 @@ trait SoapVmApis
             ];
         }
 
-        return $this->soapClient->ReconfigureComputeResource_Task($this->arrayToSoapVar($body));
+        return $this->request('ReconfigureComputeResource_Task', $body);
     }
 
     public function mountIso(string $vmId, string $fileName, int $key, int $controllerKey, string $datastore)
@@ -375,7 +389,7 @@ trait SoapVmApis
             ],
         ];
 
-        return $this->soapClient->FindRulesForVm($body);
+        return $this->request('FindRulesForVm', $body);
     }
 
     public function createFolder(string $parentFolder, string $name)
@@ -388,7 +402,7 @@ trait SoapVmApis
             'name' => $name,
         ];
 
-        return $this->soapClient->CreateFolder($body);
+        return $this->request('CreateFolder', $body);
     }
 
     public function deleteFolder(string $folderId)
@@ -400,7 +414,7 @@ trait SoapVmApis
             ],
         ];
 
-        return $this->soapClient->Destroy_Task($body);
+        return $this->request('Destroy_Task', $body);
     }
 
     public function createSnapshot(
@@ -429,7 +443,7 @@ trait SoapVmApis
             ],
         ];
 
-        return $this->soapClient->RevertToSnapshot_Task($body);
+        return $this->request('RevertToSnapshot_Task', $body);
     }
 
     public function removeSnapshot(string $snapshopId, bool $removeChildren = true, bool $consolidate = true)
@@ -443,7 +457,7 @@ trait SoapVmApis
             '$consolidate' => $consolidate,
         ];
 
-        return $this->soapClient->RemoveSnapshot_Task($body);
+        return $this->request('RemoveSnapshot_Task', $body);
     }
 
     public function queryPerf(
@@ -474,7 +488,7 @@ trait SoapVmApis
             ],
         ];
 
-        return $this->transformToArrayValues($this->soapClient->QueryPerf($body));
+        return $this->transformToArrayValues($this->request('QueryPerf', $body, false));
     }
 
     public function acquireTicket(string $vmId, string $ticketType = 'webmks')

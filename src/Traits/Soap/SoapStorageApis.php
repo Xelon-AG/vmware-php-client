@@ -26,7 +26,7 @@ trait SoapStorageApis
             ],
         ];
 
-        return $this->soapClient->RetrieveVStorageObject($this->arrayToSoapVar($body));
+        return $this->request('RetrieveVStorageObject', $body);
     }
 
     public function deleteVcenterVStorageInfo(string $vstorageId, string $datastore)
@@ -45,7 +45,7 @@ trait SoapStorageApis
             ],
         ];
 
-        return $this->soapClient->DeleteVStorageObject_Task($this->arrayToSoapVar($body));
+        return $this->request('DeleteVStorageObject_Task', $body);
     }
 
     public function createVStorage(string $name, int $capacityInMB, string $datastore, bool $keepAfterDeleteVm = true)
@@ -69,7 +69,7 @@ trait SoapStorageApis
             ],
         ];
 
-        return $this->soapClient->CreateDisk_Task($this->arrayToSoapVar($body));
+        return $this->request('CreateDisk_Task', $body);
     }
 
     public function extendVStorage(string $vstorageId, string $datastore, int $newCapacityInMB)
@@ -89,6 +89,6 @@ trait SoapStorageApis
             'newCapacityInMB' => $newCapacityInMB,
         ];
 
-        return $this->soapClient->ExtendDisk_Task($this->arrayToSoapVar($body));
+        return $this->request('ExtendDisk_Task', $body);
     }
 }
