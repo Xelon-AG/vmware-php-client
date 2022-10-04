@@ -3,27 +3,27 @@
 namespace Xelon\VmWareClient\Requests;
 
 use Illuminate\Support\Facades\Log;
-use Xelon\VmWareClient\Transform\SoapTransform;
 use stdClass;
+use Xelon\VmWareClient\Transform\SoapTransform;
 
 trait SoapRequest
 {
     use SoapTransform;
 
     /**
-     * @param string $method
-     * @param array $requestBody
-     * @param bool $convertToSoap
+     * @param  string  $method
+     * @param  array  $requestBody
+     * @param  bool  $convertToSoap
      * @return stdClass
      */
-    private function request(string $method, array $requestBody, bool $convertToSoap= true): stdClass
+    private function request(string $method, array $requestBody, bool $convertToSoap = true): stdClass
     {
         try {
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
 
             if (config('vmware-php-client.enable_logs')) {
                 Log::info(
-                    "SOAP REQUEST SUCCESS:".
+                    'SOAP REQUEST SUCCESS:'.
                     "\nSOAP method: ".$method.
                     "\nSOAP request: ".$this->soapClient->__last_request
                 );
@@ -41,9 +41,9 @@ trait SoapRequest
     }
 
     /**
-     * @param string $method
-     * @param string $vmId
-     * @param array $requestBody
+     * @param  string  $method
+     * @param  string  $vmId
+     * @param  array  $requestBody
      * @return stdClass
      */
     private function vmRequest(string $method, string $vmId, array $requestBody = [])
