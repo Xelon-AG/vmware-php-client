@@ -26,6 +26,7 @@ trait SoapVmApis
 
             if (array_keys(json_decode(json_encode($exception->detail), true))[0] === 'ManagedObjectNotFoundFault') {
                 Log::error("404 error, type: $objectType, object id: $objectId");
+
                 return new \stdClass();
             }
         }
