@@ -5,6 +5,17 @@ namespace Xelon\VmWareClient\Traits\Soap;
 use Illuminate\Support\Facades\Log;
 use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
+use Xelon\VmWareClient\Types\ClusterAntiAffinityRuleSpec;
+use Xelon\VmWareClient\Types\ClusterConfigSpecEx;
+use Xelon\VmWareClient\Types\ClusterDpmConfigInfo;
+use Xelon\VmWareClient\Types\ClusterDrsConfigInfo;
+use Xelon\VmWareClient\Types\ClusterRuleSpec;
+use Xelon\VmWareClient\Types\DVPortgroupConfigSpec;
+use Xelon\VmWareClient\Types\DVPortSetting;
+use Xelon\VmWareClient\Types\DVSTrafficShapingPolicy;
+use Xelon\VmWareClient\Types\VirtualDeviceConfigSpec;
+use Xelon\VmWareClient\Types\VirtualMachineBootOptionsBootableCdromDevice;
+use Xelon\VmWareClient\Types\VirtualMachineConfigSpec;
 
 trait SoapVmApis
 {
@@ -119,7 +130,7 @@ trait SoapVmApis
                     'bootDelay' => $params['spec']['bootOptions']['bootDelay'] ?? 0,
                     'bootRetryEnabled' => $params['spec']['bootOptions']['bootRetryEnabled'] ?? true,
                     'bootOrder' => [
-                        '@type' => 'VirtualMachineBootOptionsBootableCdromDevice'
+                        '@type' => new VirtualMachineBootOptionsBootableCdromDevice()
                     ]
                 ],*/
             ],
@@ -136,15 +147,13 @@ trait SoapVmApis
         string $name = 'New Hard disk'
     ) {
         $body = [
-            'spec' => [
-                '@type' => 'VirtualMachineConfigSpec',
-                'deviceChange' => [
-                    '@type' => 'VirtualDeviceConfigSpec',
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'add',
                     'fileOperation' => 'create',
                     'device' => $this->data->addVirtualDiskSpec($capacityInKB, $unitNumber, $isHdd, $name),
-                ],
-            ],
+                ]),
+            ]),
         ];
 
         return $this->reconfigVmTask($vmId, $body);
@@ -153,14 +162,12 @@ trait SoapVmApis
     public function editDisk(string $vmId, array $params)
     {
         $body = [
-            'spec' => [
-                '@type' => 'VirtualMachineConfigSpec',
-                'deviceChange' => [
-                    '@type' => 'VirtualDeviceConfigSpec',
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'edit',
                     'device' => $this->data->editVirtualDiskSpec($params),
-                ],
-            ],
+                ]),
+            ]),
         ];
 
         return $this->reconfigVmTask($vmId, $body);
@@ -169,14 +176,12 @@ trait SoapVmApis
     public function addPersistantDisk(string $vmId, string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000)
     {
         $body = [
-            'spec' => [
-                '@type' => 'VirtualMachineConfigSpec',
-                'deviceChange' => [
-                    '@type' => 'VirtualDeviceConfigSpec',
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'add',
                     'device' => $this->data->addBlockStorageSpec($blockStoragePath, $capacityInKB, $controllerKey),
-                ],
-            ],
+                ]),
+            ]),
         ];
 
         return $this->reconfigVmTask($vmId, $this->arrayToSoapVar($body));
@@ -185,14 +190,12 @@ trait SoapVmApis
     public function addNetwork(string $vmId, int $unitNumber, string $portgroupKey, string $switchUuid)
     {
         $body = [
-            'spec' => [
-                '@type' => 'VirtualMachineConfigSpec',
-                'deviceChange' => [
-                    '@type' => 'VirtualDeviceConfigSpec',
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'add',
                     'device' => $this->data->addNetworkSpec($switchUuid, $portgroupKey, $unitNumber),
-                ],
-            ],
+                ]),
+            ]),
         ];
 
         return $this->reconfigVmTask($vmId, $body);
@@ -206,14 +209,12 @@ trait SoapVmApis
         int $key
     ) {
         $body = [
-            'spec' => [
-                '@type' => 'VirtualMachineConfigSpec',
-                'deviceChange' => [
-                    '@type' => 'VirtualDeviceConfigSpec',
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'edit',
                     'device' => $this->data->editNetworkSpec($switchUuid, $portgroupKey, $key, $macAddress),
-                ],
-            ],
+                ]),
+            ]),
         ];
 
         return $this->reconfigVmTask($vmId, $body);
@@ -222,14 +223,12 @@ trait SoapVmApis
     public function addSasController(string $vmId)
     {
         $body = [
-            'spec' => [
-                '@type' => 'VirtualMachineConfigSpec',
-                'deviceChange' => [
-                    '@type' => 'VirtualLsiLogicSASController',
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'add',
                     'device' => $this->data->addSasControllerSpec(),
-                ],
-            ],
+                ]),
+            ]),
         ];
 
         return $this->reconfigVmTask($vmId, $body);
@@ -245,13 +244,10 @@ trait SoapVmApis
                 '_' => $distributedVirtualPortgroupId,
                 'type' => 'DistributedVirtualPortgroup',
             ],
-            'spec' => [
-                '@type' => 'DVPortgroupConfigSpec',
+            'spec' => new DVPortgroupConfigSpec([
                 'configVersion' => $configVersion,
-                'defaultPortConfig' => [
-                    '@type' => 'DVPortSetting',
-                    'inShapingPolicy' => [
-                        '@type' => 'DVSTrafficShapingPolicy',
+                'defaultPortConfig' => new DVPortSetting([
+                    'inShapingPolicy' => new DVSTrafficShapingPolicy([
                         'inherited' => false,
                         'enabled' => [
                             'inherited' => false,
@@ -269,9 +265,8 @@ trait SoapVmApis
                             'inherited' => false,
                             'value' => $speed,
                         ],
-                    ],
-                    'outShapingPolicy' => [
-                        '@type' => 'DVSTrafficShapingPolicy',
+                    ]),
+                    'outShapingPolicy' => new DVSTrafficShapingPolicy([
                         'inherited' => false,
                         'enabled' => [
                             'inherited' => false,
@@ -289,9 +284,9 @@ trait SoapVmApis
                             'inherited' => false,
                             'value' => $speed,
                         ],
-                    ],
-                ],
-            ],
+                    ]),
+                ])
+            ]),
         ];
 
         return $this->request('ReconfigureDVPortgroup_Task', $body);
@@ -302,40 +297,35 @@ trait SoapVmApis
         string $name,
         array $vmIds
     ) {
+        $vm = [];
+
+        foreach ($vmIds as $vmId) {
+            $vm[] = [
+                '_' => $vmId,
+                'type' => 'VirtualMachine',
+            ];
+        }
+
         $body = [
             '_this' => [
                 '_' => $clusterComputerResourceId,
                 'type' => 'ComputeResource',
             ],
-            'spec' => [
-                '@type' => 'ClusterConfigSpecEx',
-                'drsConfig' => [
-                    '@type' => 'ClusterDrsConfigInfo',
-                ],
-                'rulesSpec' => [
-                    '@type' => 'ClusterRuleSpec',
+            'spec' => new ClusterConfigSpecEx([
+                'drsConfig' => new ClusterDrsConfigInfo(),
+                'rulesSpec' => new ClusterRuleSpec([
                     'operation' => 'add',
-                    'info' => [
-                        '@type' => 'ClusterAntiAffinityRuleSpec',
+                    'info' => new ClusterAntiAffinityRuleSpec([
                         'enabled' => true,
                         'name' => $name,
                         'userCreated' => true,
-                    ],
-                ],
-                'dpmConfig' => [
-                    '@type' => 'ClusterDpmConfigInfo',
-                ],
-
-            ],
+                        'vm' => $vm
+                    ]),
+                ]),
+                'dpmConfig' => new ClusterDpmConfigInfo(),
+            ]),
             'modify' => false,
         ];
-
-        foreach ($vmIds as $vmId) {
-            $body['spec']['rulesSpec']['info']['vm'][] = [
-                '_' => $vmId,
-                'type' => 'VirtualMachine',
-            ];
-        }
 
         return $this->request('ReconfigureComputeResource_Task', $body);
     }
@@ -350,9 +340,7 @@ trait SoapVmApis
                 ],
                 'bootOptions' => [
                     'bootDelay' => 5000,
-                    'bootOrder' => [
-                        '@type' => 'VirtualMachineBootOptionsBootableCdromDevice',
-                    ],
+                    'bootOrder' => new VirtualMachineBootOptionsBootableCdromDevice(),
                 ],
             ],
         ];
@@ -455,7 +443,7 @@ trait SoapVmApis
                 'type' => 'VirtualMachineSnapshot',
             ],
             'removeChildren' => $removeChildren,
-            '$consolidate' => $consolidate,
+            'consolidate' => $consolidate,
         ];
 
         return $this->request('RemoveSnapshot_Task', $body);

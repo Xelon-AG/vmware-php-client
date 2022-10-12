@@ -4,6 +4,7 @@ namespace Xelon\VmWareClient\Transform;
 
 use SoapVar;
 use stdClass;
+use Xelon\VmWareClient\Types\Core\DynamicData;
 
 trait SoapTransform
 {
@@ -12,7 +13,12 @@ trait SoapTransform
         $typeName = null;
         $data = [];
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (is_array($value) || $value instanceof DynamicData) {
+                if ($value instanceof DynamicData) {
+                    $typeName = (new \ReflectionClass($value))->getShortName();
+                    $value = $value->toArray();
+                }
+
                 if (array_key_exists('@type', $value)) {
                     $typeName = $value['@type'];
                     unset($value['@type']);

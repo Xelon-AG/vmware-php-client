@@ -4,6 +4,7 @@ namespace Xelon\VmWareClient\Traits\Soap;
 
 use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
+use Xelon\VmWareClient\Types\VslmCreateSpecDiskFileBackingSpec;
 
 trait SoapStorageApis
 {
@@ -58,13 +59,12 @@ trait SoapStorageApis
             'spec' => [
                 'name' => $name,
                 'keepAfterDeleteVm' => $keepAfterDeleteVm,
-                'backingSpec' => [
-                    '@type' => 'VslmCreateSpecDiskFileBackingSpec',
+                'backingSpec' => new VslmCreateSpecDiskFileBackingSpec([
                     'datastore' => [
                         'type' => 'Datastore',
                         '_' => $datastore,
                     ],
-                ],
+                ]),
                 'capacityInMB' => $capacityInMB,
             ],
         ];

@@ -6,6 +6,7 @@ use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
+use Xelon\VmWareClient\Types\NamePasswordAuthentication;
 
 trait SoapGuestApis
 {
@@ -41,12 +42,11 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
-                '@type' => 'NamePasswordAuthentication',
+            'auth' => new NamePasswordAuthentication([
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
             'guestFilePath' => "{$guestFilePath}",
             'fileAttributes' => new \stdClass(),
             'fileSize' => strlen($data),
@@ -84,12 +84,11 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
-                '@type' => 'NamePasswordAuthentication',
+            'auth' => new NamePasswordAuthentication([
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
             'prefix' => $prefix,
             'suffix' => $sufix,
             'directoryPath' => $directoryPath,
@@ -113,12 +112,11 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
-                '@type' => 'NamePasswordAuthentication',
+            'auth' => new NamePasswordAuthentication([
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
             'directoryPath' => $directoryPath,
             'recursive' => true,
         ];
@@ -141,12 +139,11 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
-                '@type' => 'NamePasswordAuthentication',
+            'auth' => new NamePasswordAuthentication([
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
             'filePath' => $filePath,
         ];
 
@@ -169,12 +166,11 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
-                '@type' => 'NamePasswordAuthentication',
+            'auth' => new NamePasswordAuthentication([
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
             'spec' => [
                 'programPath' => $program,
                 'arguments' => "{$filePath}",
@@ -232,12 +228,11 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
-                '@type' => 'NamePasswordAuthentication',
+            'auth' => new NamePasswordAuthentication([
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
             'filePath' => $filePath,
         ];
 
@@ -258,12 +253,12 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
+            'auth' => new NamePasswordAuthentication([
                 '@type' => 'NamePasswordAuthentication',
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
         ];
 
         return $this->request('ListProcessesInGuest', $body);
@@ -280,12 +275,11 @@ trait SoapGuestApis
                 'type' => 'VirtualMachine',
                 '_' => $vmId,
             ],
-            'auth' => [
-                '@type' => 'NamePasswordAuthentication',
+            'auth' => new NamePasswordAuthentication([
                 'interactiveSession' => false,
                 'username' => $username,
                 'password' => $password,
-            ],
+            ]),
         ];
 
         return $this->request('ValidateCredentialsInGuest', $body);
