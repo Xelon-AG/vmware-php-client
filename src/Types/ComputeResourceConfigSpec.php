@@ -13,5 +13,4 @@ class ComputeResourceConfigSpec extends DynamicData
     public $defaultHardwareVersionKey;
 
     public $desiredSoftwareSpec;
-
 }

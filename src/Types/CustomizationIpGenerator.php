@@ -6,5 +6,4 @@ use Xelon\VmWareClient\Types\Core\DynamicData;
 
 class CustomizationIpGenerator extends DynamicData
 {
-
 }
