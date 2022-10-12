@@ -73,14 +73,15 @@ For now, the lib has only some methods available. You can find full list of file
 ​
 > We plan to add the full list of methods later.
 ​
+
 Here's how to make your first SOAP call:
 ```php
 $folder = $vcenterClient->soap->createFolder('group-v3', 'foldername');
 ```
 ​
-If you want to use both modes at one time you can set `both` mode (Xelon\VmWareClient\VcenterClient::MODE_BOTH).
+If you want to use both modes at one time you can set `both` mode (Xelon\VmWareClient\VcenterClient::MODE_BOTH). 
 ​
-If you want to run custom `soap` method, which you do not find in lib, you can run this method directly:
+ If you want to run custom `soap` method, which you do not find in lib, you can run this method directly:
 ```php
 $vcenterClient = new Xelon\VmWareClient\VcenterClient(
     'https://10.20.30.40', 
