@@ -285,7 +285,7 @@ trait SoapVmApis
                             'value' => $speed,
                         ],
                     ]),
-                ])
+                ]),
             ]),
         ];
 
@@ -319,7 +319,7 @@ trait SoapVmApis
                         'enabled' => true,
                         'name' => $name,
                         'userCreated' => true,
-                        'vm' => $vm
+                        'vm' => $vm,
                     ]),
                 ]),
                 'dpmConfig' => new ClusterDpmConfigInfo(),

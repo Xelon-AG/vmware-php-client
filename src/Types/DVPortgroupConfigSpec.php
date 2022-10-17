@@ -39,5 +39,4 @@ class DVPortgroupConfigSpec extends DynamicData
     public $logicalSwitchUuid;
 
     public $segmentId;
-
 }
