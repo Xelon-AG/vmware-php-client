@@ -126,6 +126,7 @@ class VmWareClientInit
         if (! $sessionInfo) {
             $this->createSoapSession();
         } elseif ($this->isSessionExpired($sessionInfo['expired_at'])) {
+            $this->deleteSoapSession();
             $this->createSoapSession();
         } else {
             $this->createSoapClientWithExistingSession($sessionInfo['vmware_soap_session']);
@@ -175,6 +176,7 @@ class VmWareClientInit
             ]);
         } catch (\Exception $e) {
             Log::error('Soap api exception : '.$e->getMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -197,12 +199,16 @@ class VmWareClientInit
 
     private function deleteSoapSession()
     {
-        $sessionManager = new \stdClass();
-        $sessionManager->_ = $sessionManager->type = 'SessionManager';
+        try {
+            Cache::forget("vcenter-soap-session-$this->ip");
 
-        $soaplogout['_this'] = $sessionManager;
-        $this->soapClient->Logout($soaplogout);
+            $sessionManager = new \stdClass();
+            $sessionManager->_ = $sessionManager->type = 'SessionManager';
 
-        Cache::forget("vcenter-soap-session-$this->ip");
+            $soaplogout['_this'] = $sessionManager;
+            $this->soapClient->Logout($soaplogout);
+        } catch (\Exception $exception) {
+            Log::error('Can\'t delete soap session');
+        }
     }
 }
