@@ -16,7 +16,7 @@ trait SoapRequest
      * @param  bool  $convertToSoap
      * @return stdClass
      */
-    public function request(string $method, array $requestBody, bool $convertToSoap = true): stdClass
+    public function request(string $method, array $requestBody, bool $convertToSoap = true)
     {
         try {
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
