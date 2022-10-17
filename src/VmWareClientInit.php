@@ -158,8 +158,19 @@ class VmWareClientInit
             ];
             $this->soapClient->Login($loginMessage);
 
+            if (isset($this->soapClient->_cookies)) {
+                $sessionToken = $this->soapClient->_cookies['vmware_soap_session'][0];
+            } else {
+                $responseHeaders = $this->soapClient->__last_response_headers;
+
+                $string = strstr($responseHeaders, 'vmware_soap_session');
+                $string = strstr($string, '"');
+                $string = ltrim($string, '"');
+                $sessionToken = substr($string, 0, strpos($string, '"'));
+            }
+
             Cache::add("vcenter-soap-session-$this->ip", [
-                'vmware_soap_session' => $this->soapClient->_cookies['vmware_soap_session'][0],
+                'vmware_soap_session' => $sessionToken,
                 'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
             ]);
         } catch (\Exception $e) {
