@@ -58,12 +58,12 @@ trait SoapGuestApis
         $client = new GuzzleClient(['verify' => false]);
 
         try {
-            if (is_string($response->returnval) && substr($response->returnval, 0, 4) !== 'http') {
+            if (isset($response->returnval) && is_string($response->returnval) && substr($response->returnval, 0, 4) !== 'http') {
                 throw new Exception('File transfer invalid response url');
             }
             $client->request('PUT', $response->returnval, ['body' => $data]);
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            throw new Exception("{$e->getMessage()}. Resonse: " . json_encode($response));
         }
     }
 
