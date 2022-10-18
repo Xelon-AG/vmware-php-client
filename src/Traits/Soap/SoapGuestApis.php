@@ -63,7 +63,7 @@ trait SoapGuestApis
             }
             $client->request('PUT', $response->returnval, ['body' => $data]);
         } catch (Exception $e) {
-            throw new Exception("{$e->getMessage()}. Resonse: " . json_encode($response));
+            throw new Exception("{$e->getMessage()}. Response: " . json_encode($response));
         }
     }
 
