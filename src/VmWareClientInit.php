@@ -126,7 +126,6 @@ class VmWareClientInit
         if (! $sessionInfo) {
             $this->createSoapSession();
         } elseif ($this->isSessionExpired($sessionInfo['expired_at'])) {
-            $this->deleteSoapSession();
             $this->createSoapSession();
         } else {
             $this->createSoapClientWithExistingSession($sessionInfo['vmware_soap_session']);

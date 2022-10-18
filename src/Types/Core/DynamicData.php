@@ -13,13 +13,37 @@ class DynamicData
         }
     }
 
+    /**
+     * @return array
+     * Generate array of class properties in order from parent to child
+     */
     public function toArray(): array
     {
         $data = [];
+        $classes = [];
+        $properties = [];
 
-        foreach ($this as $property => $value) {
-            if ($value !== null) {
-                $data[$property] = $value;
+        $currentClass = static::class;
+        while ($currentClass && $currentClass !== self::class) {
+            $classes[] = $currentClass;
+            $currentClass = get_parent_class($currentClass);
+        }
+
+        $classes = array_reverse($classes);
+
+        foreach ($classes as $class) {
+            $classInfo = new \ReflectionClass($class);
+
+            foreach ($classInfo->getProperties() as $prop) {
+                if ($prop->class === $class) {
+                    $properties[] = $prop->getName();
+                }
+            }
+        }
+
+        foreach ($properties as $property) {
+            if ($this->$property !== null) {
+                $data[$property] = $this->$property;
             }
         }
 
