@@ -136,7 +136,7 @@ trait SoapVmApis
             ],
         ];
 
-        return $this->vmRequest('CloneVM_Task', $vmId, $this->arrayToSoapVar($body));
+        return $this->vmRequest('CloneVM_Task', $vmId, $body);
     }
 
     public function addDisk(

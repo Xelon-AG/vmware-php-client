@@ -8,6 +8,15 @@ use Xelon\VmWareClient\Types\Core\DynamicData;
 
 trait SoapTransform
 {
+    private $soapTypes = [
+        'string' => XSD_STRING,
+        'integer' => XSD_INT,
+        'boolean' => XSD_BOOLEAN,
+        'double' => XSD_FLOAT,
+        'array' => SOAP_ENC_OBJECT,
+        'object' => SOAP_ENC_OBJECT,
+    ];
+
     public function arrayToSoapVar(array $array): array
     {
         $typeName = null;
@@ -43,7 +52,7 @@ trait SoapTransform
                             continue;
                         }
 
-                        $data[] = new SoapVar($this->arrayToSoapVar($childItem), SOAP_ENC_OBJECT, $typeName, null);
+                        $data[] = new SoapVar($this->arrayToSoapVar($childItem), SOAP_ENC_OBJECT, $typeName, null, $key);
                     }
 
                     unset($array[$key]);
@@ -52,12 +61,12 @@ trait SoapTransform
                 }
 
                 if (! isset($deepArraySet)) {
-                    $data[$key] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, $key);
+                    $data[] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, $key);
                 }
 
                 $typeName = null;
             } elseif (! is_null($value)) {
-                $data[$key] = $value;
+                $data[] = new SoapVar($value, null, $this->soapTypes[gettype($value)] ?? null, null, $key);
             }
         }
 
