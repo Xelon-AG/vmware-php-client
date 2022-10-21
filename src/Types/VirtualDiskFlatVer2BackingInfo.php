@@ -2,7 +2,7 @@
 
 namespace Xelon\VmWareClient\Types;
 
-class VirtualDiskFlatVer2BackingInfo extends VirtualDeviceBackingInfo
+class VirtualDiskFlatVer2BackingInfo extends VirtualDeviceFileBackingInfo
 {
     public $diskMode;
 

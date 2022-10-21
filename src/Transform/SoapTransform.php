@@ -47,7 +47,7 @@ trait SoapTransform
                         }
 
                         if (array_key_exists('type', $childItem)) {
-                            $data[] = new SoapVar($childItem['_'], null, $childItem['type'], '', $key, '');
+                            $data[$key] = new SoapVar($childItem['_'], null, $childItem['type'], '', $key, '');
 
                             continue;
                         }
@@ -61,12 +61,12 @@ trait SoapTransform
                 }
 
                 if (! isset($deepArraySet)) {
-                    $data[] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, $key);
+                    $data[$key] = new SoapVar($this->arrayToSoapVar($value), SOAP_ENC_OBJECT, $typeName, null, $key);
                 }
 
                 $typeName = null;
             } elseif (! is_null($value)) {
-                $data[] = new SoapVar($value, null, $this->soapTypes[gettype($value)] ?? null, null, $key);
+                $data[$key] = new SoapVar($value, null, null, null, $key);
             }
         }
 
