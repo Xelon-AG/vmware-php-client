@@ -35,7 +35,7 @@ trait SoapRequest
                 "\nSOAP method: ".$method.
                 "\nSOAP request: ".$this->soapClient->__last_request ?? ''.
                 "\nSOAP response: ".$this->soapClient->__last_response ?? ''.
-                "\nTrace: " . json_encode($exception->getTrace());
+                "\nTrace: ".json_encode($exception->getTrace());
 
             Log::error($message);
             throw new \Exception($message);
