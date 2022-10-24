@@ -207,7 +207,7 @@ class SoapData
                 'subnetMask' => $subnetMask,
                 'dnsServerList' => $dnsServerList,
                 'gateway' => $gateway,
-            ])
+            ]),
         ]);
     }
 
