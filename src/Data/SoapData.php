@@ -2,11 +2,14 @@
 
 namespace Xelon\VmWareClient\Data;
 
+use Xelon\VmWareClient\Types\CustomizationAdapterMapping;
 use Xelon\VmWareClient\Types\CustomizationFixedIp;
 use Xelon\VmWareClient\Types\CustomizationFixedName;
 use Xelon\VmWareClient\Types\CustomizationGuiUnattended;
 use Xelon\VmWareClient\Types\CustomizationIdentification;
+use Xelon\VmWareClient\Types\CustomizationIPSettings;
 use Xelon\VmWareClient\Types\CustomizationPassword;
+use Xelon\VmWareClient\Types\CustomizationSysprep;
 use Xelon\VmWareClient\Types\CustomizationUserData;
 use Xelon\VmWareClient\Types\Description;
 use Xelon\VmWareClient\Types\DistributedVirtualSwitchPortConnection;
@@ -194,23 +197,23 @@ class SoapData
         ]);
     }
 
-    public function fixedIpAdapterSpec(string $ip, string $subnetMask, array $dnsServerList, array $gateway): array
+    public function fixedIpAdapterSpec(string $ip, string $subnetMask, array $dnsServerList, array $gateway): CustomizationAdapterMapping
     {
-        return [
-            'adapter' => new CustomizationFixedIp([
-                'ipAddress' => $ip,
-            ]),
-            'subnetMask' => $subnetMask,
-            'dnsServerList' => $dnsServerList,
-            'gateway' => $gateway,
-
-        ];
+        return new CustomizationAdapterMapping([
+            'adapter' => new CustomizationIPSettings([
+                'ip' => new CustomizationFixedIp([
+                    'ipAddress' => $ip,
+                ]),
+                'subnetMask' => $subnetMask,
+                'dnsServerList' => $dnsServerList,
+                'gateway' => $gateway,
+            ])
+        ]);
     }
 
-    public function customizationIdendity(string $hostname, string $license, string $password, string $name): array
+    public function customizationIdendity(string $hostname, string $license, string $password, string $name): CustomizationSysprep
     {
-        return [
-            'type' => 'CustomizationSysprep',
+        return new CustomizationSysprep([
             'guiUnattended' => new CustomizationGuiUnattended([
                 'password' => new CustomizationPassword([
                     'plainText' => true,
@@ -232,6 +235,6 @@ class SoapData
             'identification' => new CustomizationIdentification([
                 'joinWorkgroup' => 'workgroup',
             ]),
-        ];
+        ]);
     }
 }

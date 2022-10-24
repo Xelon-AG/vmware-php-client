@@ -2,7 +2,7 @@
 
 namespace Xelon\VmWareClient\Types\Core;
 
-class DynamicData
+class DynamicData implements \Countable
 {
     public function __construct(array $data = [])
     {
@@ -48,5 +48,18 @@ class DynamicData
         }
 
         return $data;
+    }
+
+    public function count(): int
+    {
+        $count = 0;
+
+        foreach ($this as $property) {
+            if ($property !== null) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }

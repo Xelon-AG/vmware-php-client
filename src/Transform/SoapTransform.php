@@ -41,13 +41,24 @@ trait SoapTransform
 
                 if (is_array($value) && array_key_exists(0, $value)) {
                     foreach ($value as $childItem) {
-                        if (array_key_exists('@type', $childItem)) {
-                            $typeName = $childItem['@type'];
-                            unset($childItem['@type']);
+                        if ($childItem instanceof DynamicData) {
+                            $typeName = (new \ReflectionClass($childItem))->getShortName();
+                            $childItem = $childItem->toArray();
                         }
 
-                        if (array_key_exists('type', $childItem)) {
-                            $data[$key] = new SoapVar($childItem['_'], null, $childItem['type'], '', $key, '');
+                        if (is_array($childItem)) {
+                            if (array_key_exists('@type', $childItem)) {
+                                $typeName = $childItem['@type'];
+                                unset($childItem['@type']);
+                            }
+
+                            if (array_key_exists('type', $childItem)) {
+                                $data[$key] = new SoapVar($childItem['_'], null, $childItem['type'], '', $key, '');
+
+                                continue;
+                            }
+                        } else {
+                            $data[$key] = new SoapVar($childItem, null, null, null, $key);
 
                             continue;
                         }
@@ -55,7 +66,7 @@ trait SoapTransform
                         $data[] = new SoapVar($this->arrayToSoapVar($childItem), SOAP_ENC_OBJECT, $typeName, null, $key);
                     }
 
-                    unset($array[$key]);
+                    // unset($array[$key]);
 
                     $deepArraySet = true;
                 }

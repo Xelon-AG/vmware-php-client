@@ -31,12 +31,14 @@ trait SoapRequest
 
             return $response;
         } catch (\Exception $exception) {
-            Log::error(
-                "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
+            $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
                 "\nSOAP method: ".$method.
                 "\nSOAP request: ".$this->soapClient->__last_request ?? ''.
-                "\nSOAP response: ".$this->soapClient->__last_response ?? ''
-            );
+                "\nSOAP response: ".$this->soapClient->__last_response ?? ''.
+                "\nTrace: " . json_encode($exception->getTrace());
+
+            Log::error($message);
+            throw new \Exception($message);
         }
     }
 
