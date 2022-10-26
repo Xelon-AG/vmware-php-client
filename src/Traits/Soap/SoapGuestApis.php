@@ -97,6 +97,66 @@ trait SoapGuestApis
         return $this->request('CreateTemporaryDirectoryInGuest', $body);
     }
 
+    public function makeDirectoryInGuest(
+        string $username,
+        string $password,
+        string $vmId,
+        string $directoryPath,
+        bool $createParentDirectories = false
+    ) {
+        $body = [
+            '_this' => [
+                'type' => 'GuestFileManager',
+                '_' => 'guestOperationsFileManager',
+            ],
+            'vm' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+            'auth' => new NamePasswordAuthentication([
+                'interactiveSession' => false,
+                'username' => $username,
+                'password' => $password,
+            ]),
+            'directoryPath' => $directoryPath,
+            'createParentDirectories' => $createParentDirectories
+        ];
+
+        return $this->request('MakeDirectoryInGuest', $body);
+    }
+
+    public function listFilesInGuest(
+        string $username,
+        string $password,
+        string $vmId,
+        string $filePath,
+        int $index = 0,
+        int $maxResults = 50,
+        ?string $matchPattern = null
+    ) {
+        $body = [
+            '_this' => [
+                'type' => 'GuestFileManager',
+                '_' => 'guestOperationsFileManager',
+            ],
+            'vm' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+            'auth' => new NamePasswordAuthentication([
+                'interactiveSession' => false,
+                'username' => $username,
+                'password' => $password,
+            ]),
+            'filePath' => $filePath,
+            'index' => $index,
+            'maxResults' => $maxResults,
+            'matchPattern' => $matchPattern
+        ];
+
+        return $this->request('ListFilesInGuest', $body);
+    }
+
     public function deleteDirectoryInGuest(
         string $username,
         string $password,

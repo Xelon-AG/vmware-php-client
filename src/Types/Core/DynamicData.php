@@ -2,7 +2,7 @@
 
 namespace Xelon\VmWareClient\Types\Core;
 
-class DynamicData implements \Countable
+class DynamicData implements \Countable, \JsonSerializable
 {
     public function __construct(array $data = [])
     {
@@ -61,5 +61,10 @@ class DynamicData implements \Countable
         }
 
         return $count;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }

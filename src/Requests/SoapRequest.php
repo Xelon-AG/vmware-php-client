@@ -31,11 +31,18 @@ trait SoapRequest
 
             return $response;
         } catch (\Exception $exception) {
-            $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
-                "\nSOAP method: ".$method.
-                "\nSOAP request: ".$this->soapClient->__last_request ?? ''.
-                "\nSOAP response: ".$this->soapClient->__last_response ?? ''.
-                "\nTrace: ".json_encode($exception->getTrace());
+            $message = "SOAP REQUEST FAILED:\nMessage: " . $exception->getMessage() .
+            "\nSOAP method: " . $method .
+            (
+                property_exists($this->soapClient, '__last_request')
+                    ? "\nSOAP request: " . $this->soapClient->__last_request
+                    : ''
+            ) . (
+                property_exists($this->soapClient, '__last_request')
+                    ? "\nSOAP response: " . $this->soapClient->__last_response
+                    : ''
+                ) .
+                "\nTrace: " . json_encode($exception->getTrace());
 
             Log::error($message);
             throw new \Exception($message);
