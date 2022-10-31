@@ -51,6 +51,7 @@ trait SoapVmApis
     {
         if (substr($vmId, 0, 2) !== 'vm') {
             Log::error("Wrong vm id format: $vmId");
+
             return new \stdClass();
         }
 
