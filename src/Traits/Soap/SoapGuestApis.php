@@ -47,7 +47,7 @@ trait SoapGuestApis
                 'username' => $username,
                 'password' => $password,
             ]),
-            'guestFilePath' => "{$guestFilePath}",
+            'guestFilePath' => $guestFilePath,
             'fileAttributes' => new \stdClass(),
             'fileSize' => strlen($data),
             'overwrite' => true,
@@ -233,7 +233,7 @@ trait SoapGuestApis
             ]),
             'spec' => [
                 'programPath' => $program,
-                'arguments' => "{$filePath}",
+                'arguments' => $filePath,
             ],
         ];
 

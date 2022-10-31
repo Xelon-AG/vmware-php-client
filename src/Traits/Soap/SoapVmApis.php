@@ -50,7 +50,8 @@ trait SoapVmApis
     public function getVmInfo(string $vmId, string $pathSet = '')
     {
         if (substr($vmId, 0, 2) !== 'vm') {
-            throw new \Exception('Wrong vm id format!');
+            Log::error("Wrong vm id format: $vmId");
+            return new \stdClass();
         }
 
         return $this->getObjectInfo($vmId, 'VirtualMachine', $pathSet);
