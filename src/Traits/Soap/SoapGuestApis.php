@@ -119,7 +119,7 @@ trait SoapGuestApis
                 'password' => $password,
             ]),
             'directoryPath' => $directoryPath,
-            'createParentDirectories' => $createParentDirectories
+            'createParentDirectories' => $createParentDirectories,
         ];
 
         return $this->request('MakeDirectoryInGuest', $body);
@@ -151,7 +151,7 @@ trait SoapGuestApis
             'filePath' => $filePath,
             'index' => $index,
             'maxResults' => $maxResults,
-            'matchPattern' => $matchPattern
+            'matchPattern' => $matchPattern,
         ];
 
         return $this->request('ListFilesInGuest', $body);
