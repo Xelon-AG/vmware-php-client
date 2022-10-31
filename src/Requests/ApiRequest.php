@@ -24,12 +24,21 @@ trait ApiRequest
             return [
                 'isError' => true,
                 'code' => $e->getCode(),
-                'info' => json_decode($e->getResponse()->getBody()->getContents()),
+                'info' => $this->transformErrorInfo(json_decode($e->getResponse()->getBody()->getContents(), true)),
             ];
         } catch (ClientException $e) {
             // if 401, create new session and reply attempt
         } catch (\Exception $e) {
             Log::error('Rest api exception : '.$e->getMessage());
         }
+    }
+
+    private function transformErrorInfo(array $info)
+    {
+        if (count($info['messages']) === 0) {
+            $info['messages'][0]['default_message'] = $info['error_type'];
+        }
+
+        return $info;
     }
 }
