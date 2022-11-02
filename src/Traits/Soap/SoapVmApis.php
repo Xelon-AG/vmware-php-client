@@ -415,7 +415,7 @@ trait SoapVmApis
     public function createSnapshot(
         string $vmId,
         string $name,
-        string $description,
+        ?string $description,
         bool $memory = false,
         bool $quiesce = true
     ) {
