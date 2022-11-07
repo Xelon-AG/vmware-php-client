@@ -108,8 +108,8 @@ class VmWareClientInit
         try {
             $this->guzzleClient->delete(
                 $this->version >= 7 ? 'api/session' : '/rest/com/vmware/cis/session',
-                ['headers' => ['vmware-api-session-id' => $apiSessionId,],
-            ]);
+                ['headers' => ['vmware-api-session-id' => $apiSessionId],
+                ]);
         } catch (\Exception $exception) {
         }
 
