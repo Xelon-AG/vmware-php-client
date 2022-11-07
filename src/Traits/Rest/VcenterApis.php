@@ -3,10 +3,12 @@
 namespace Xelon\VmWareClient\Traits\Rest;
 
 use Xelon\VmWareClient\Requests\ApiRequest;
+use Xelon\VmWareClient\Transform\SoapTransform;
 
 trait VcenterApis
 {
     use ApiRequest;
+    use SoapTransform;
 
     public function createVm()
     {
@@ -15,9 +17,11 @@ trait VcenterApis
 
     public function getVmList(array $requestBody = [])
     {
-        $query = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($requestBody, null, '&'));
-
-        return $this->request('get', "$this->apiUrlPrefix/vcenter/vm", ['query' => $query]);
+        return $this->request(
+            'get',
+            "$this->apiUrlPrefix/vcenter/vm",
+            ['query' => $this->getListFilterQuery($requestBody)]
+        );
     }
 
     public function getVmInfo(string $vmId)
@@ -57,8 +61,10 @@ trait VcenterApis
 
     public function getNetworkList(array $requestBody = [])
     {
-        $query = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($requestBody, null, '&'));
-
-        return $this->request('get', "$this->apiUrlPrefix/vcenter/network", ['query' => $query]);
+        return $this->request(
+            'get',
+            "$this->apiUrlPrefix/vcenter/network",
+            ['query' => $this->getListFilterQuery($requestBody)]
+        );
     }
 }

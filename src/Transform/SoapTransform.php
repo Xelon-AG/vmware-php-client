@@ -157,6 +157,18 @@ trait SoapTransform
         return $object;
     }
 
+    public function getListFilterQuery(array $filter): string
+    {
+        if ($this->version < 7) {
+            foreach ($filter as $key => $value) {
+                $filter["filter.$key"] = $value;
+                unset($filter[$key]);
+            }
+        }
+
+        return preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($filter, null, '&'));
+    }
+
     private function transformToArrayValuesRecursive(&$object, string $propertyName)
     {
         if (is_array($object)) {

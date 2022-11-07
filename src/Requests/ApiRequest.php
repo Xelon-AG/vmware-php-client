@@ -42,7 +42,11 @@ trait ApiRequest
     private function transformErrorInfo(array $info)
     {
         if ($this->version < 7) {
-            $info['messages'] = $info['value']['messages'];
+            if (isset($info['value']['messages'])) {
+                $info['messages'] = $info['value']['messages'];
+            } elseif (isset($info['localizableMessages'])) {
+                $info['messages'] = $info['localizableMessages'];
+            }
         } elseif (count($info['messages']) === 0) {
             $info['messages'][0]['default_message'] = $info['error_type'];
         }
