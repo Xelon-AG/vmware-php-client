@@ -24,15 +24,23 @@ class VmWareClientInit
 
     private string $password;
 
+    protected float $version;
+
     protected ?GuzzleClient $guzzleClient;
 
     protected ?\SoapClient $soapClient;
 
-    public function __construct(string $ip, string $login, string $password, string $mode = self::MODE_REST)
-    {
+    public function __construct(
+        string $ip,
+        string $login,
+        string $password,
+        string $mode = self::MODE_REST,
+        float $version = 7
+    ) {
         $this->ip = $ip;
         $this->login = $login;
         $this->password = $password;
+        $this->version = $version;
 
         switch ($mode) {
             case self::MODE_REST:
@@ -68,8 +76,15 @@ class VmWareClientInit
     private function createRestSession(): void
     {
         try {
-            $authReponse = $this->guzzleClient->post('/api/session', ['auth' => [$this->login, $this->password]]);
+            $authReponse = $this->guzzleClient->post(
+                $this->version >= 7 ? '/api/session' : '/rest/com/vmware/cis/session',
+                ['auth' => [$this->login, $this->password]]
+            );
             $apiSessionId = json_decode($authReponse->getBody());
+
+            if ($this->version < 7) {
+                $apiSessionId = $apiSessionId->value;
+            }
 
             Cache::add("vcenter-rest-session-$this->ip", [
                 'api_session_id' => $apiSessionId,
@@ -91,10 +106,9 @@ class VmWareClientInit
     private function deleteRestSession(string $apiSessionId): void
     {
         try {
-            $this->guzzleClient->delete('api/session', [
-                'headers' => [
-                    'vmware-api-session-id' => $apiSessionId,
-                ],
+            $this->guzzleClient->delete(
+                $this->version >= 7 ? 'api/session' : '/rest/com/vmware/cis/session',
+                ['headers' => ['vmware-api-session-id' => $apiSessionId,],
             ]);
         } catch (\Exception $exception) {
         }

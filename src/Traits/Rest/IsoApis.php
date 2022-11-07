@@ -10,17 +10,27 @@ trait IsoApis
 
     public function mountImage(string $vmId, string $libraryItem)
     {
-        return $this->request('post', '/api/vcenter/iso/image?action=mount', ['form_params' => [
-            'library_item' => $libraryItem,
-            'vm' => $vmId,
-        ]]);
+        if ($this->version >= 7) {
+            $url = '/api/vcenter/iso/image?action=mount';
+            $params = ['library_item' => $libraryItem, 'vm' => $vmId];
+        } else {
+            $url = "/rest/com/vmware/vcenter/iso/image/id:$libraryItem?~action=mount";
+            $params = ['vm' => $vmId];
+        }
+
+        return $this->request('post', $url, ['form_params' => $params]);
     }
 
     public function unmountImage(string $vmId, string $cdRom)
     {
-        return $this->request('post', '/api/vcenter/iso/image?action=unmount', ['form_params' => [
-            'cdrom' => $cdRom,
-            'vm' => $vmId,
-        ]]);
+        if ($this->version >= 7) {
+            $url = '/api/vcenter/iso/image?action=unmount';
+            $params = ['cdrom' => $cdRom, 'vm' => $vmId];
+        } else {
+            $url = "/rest/com/vmware/vcenter/iso/image/id:$vmId?~action=unmount";
+            $params = ['cdrom' => $cdRom];
+        }
+
+        return $this->request('post', $url, ['form_params' => $params]);
     }
 }

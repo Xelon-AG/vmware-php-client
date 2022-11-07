@@ -27,7 +27,7 @@ trait SoapStorageApis
             ],
         ];
 
-        return $this->request('RetrieveVStorageObject', $body);
+        return $this->transformToArrayValues($this->request('RetrieveVStorageObject', $body));
     }
 
     public function deleteVcenterVStorageInfo(string $vstorageId, string $datastore)

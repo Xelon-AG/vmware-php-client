@@ -106,6 +106,7 @@ trait SoapTransform
             ['latestPage', 'TaskInfo'],
             ['returnval', 'sampleInfo'],
             ['returnval', 'value', 'value'],
+            ['returnval', 'config', 'consumerId'],
             ['layoutEx', 'file'],
             ['layoutEx', 'snapshot'],
             ['layoutEx', 'snapshot', 'disk'],

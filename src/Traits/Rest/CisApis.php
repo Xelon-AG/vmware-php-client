@@ -12,7 +12,9 @@ trait CisApis
     {
         return $this->request(
             'post',
-            '/api/cis/tagging/tag-association?action=list-attached-tags',
+            $this->version >= 7
+                ? '/api/cis/tagging/tag-association?action=list-attached-tags'
+                : '/rest/com/vmware/cis/tagging/tag-association?~action=list-attached-tags',
             [
                 'json' => [
                     'object_id' => [
@@ -28,7 +30,9 @@ trait CisApis
     {
         return $this->request(
             'post',
-            "/api/cis/tagging/tag-association/$tagId?action=attach",
+            $this->version >= 7
+                ? "/api/cis/tagging/tag-association/$tagId?action=attach"
+                : "/rest/com/vmware/cis/tagging/tag-association/id:$tagId?~action=attach",
             [
                 'json' => [
                     'object_id' => [
@@ -44,7 +48,9 @@ trait CisApis
     {
         return $this->request(
             'post',
-            "/api/cis/tagging/tag-association/$tagId?action=detach",
+            $this->version >= 7
+                ? "/api/cis/tagging/tag-association/$tagId?action=detach"
+                : "/rest/com/vmware/cis/tagging/tag-association/id:$tagId?~action=detach",
             [
                 'json' => [
                     'object_id' => [

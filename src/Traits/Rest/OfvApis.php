@@ -51,7 +51,9 @@ trait OfvApis
 
         return $this->request(
             'post',
-            "/api/vcenter/ovf/library-item/$ovfLibraryItemId?action=deploy",
+            $this->version >= 7
+                ? "/api/vcenter/ovf/library-item/$ovfLibraryItemId?action=deploy"
+                : "/rest/com/vmware/vcenter/ovf/library-item/id:$ovfLibraryItemId?~action=deploy",
             ['json' => $body]
         );
     }

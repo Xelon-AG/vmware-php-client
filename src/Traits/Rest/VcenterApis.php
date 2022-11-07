@@ -17,22 +17,22 @@ trait VcenterApis
     {
         $query = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($requestBody, null, '&'));
 
-        return $this->request('get', '/api/vcenter/vm', ['query' => $query]);
+        return $this->request('get', "$this->apiUrlPrefix/vcenter/vm", ['query' => $query]);
     }
 
     public function getVmInfo(string $vmId)
     {
-        return $this->request('get', "/api/vcenter/vm/$vmId");
+        return $this->request('get', "$this->apiUrlPrefix/vcenter/vm/$vmId");
     }
 
     public function deleteVm(string $vmId)
     {
-        return $this->request('delete', "/api/vcenter/vm/$vmId");
+        return $this->request('delete', "$this->apiUrlPrefix/vcenter/vm/$vmId");
     }
 
     public function cloneVm(array $requestBody)
     {
-        return $this->request('post', '/api/vcenter/vm?action=clone', ['json' => $requestBody]);
+        return $this->request('post', "$this->apiUrlPrefix/vcenter/vm?action=clone", ['json' => $requestBody]);
     }
 
     public function registerVm()
@@ -59,6 +59,6 @@ trait VcenterApis
     {
         $query = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', http_build_query($requestBody, null, '&'));
 
-        return $this->request('get', '/api/vcenter/network', ['query' => $query]);
+        return $this->request('get', "$this->apiUrlPrefix/vcenter/network", ['query' => $query]);
     }
 }

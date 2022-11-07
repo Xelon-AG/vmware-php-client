@@ -13,7 +13,13 @@ trait ApiRequest
     private function request(string $method, string $uri, array $options = [])
     {
         try {
-            return json_decode($this->guzzleClient->request($method, $uri, $options)->getBody());
+            $result = json_decode($this->guzzleClient->request($method, $uri, $options)->getBody());
+
+            if ($this->version < 7 && isset($result->value)) {
+                return $result->value;
+            }
+
+            return $result;
         } catch (ConnectException $e) {
             Log::error('Rest api Connect exception: '.$e->getMessage());
         } catch (ServerException $e) {
@@ -35,7 +41,9 @@ trait ApiRequest
 
     private function transformErrorInfo(array $info)
     {
-        if (count($info['messages']) === 0) {
+        if ($this->version < 7) {
+            $info['messages'] = $info['value']['messages'];
+        } elseif (count($info['messages']) === 0) {
             $info['messages'][0]['default_message'] = $info['error_type'];
         }
 
