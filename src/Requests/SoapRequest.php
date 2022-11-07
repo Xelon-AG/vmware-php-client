@@ -26,7 +26,7 @@ trait SoapRequest
                     'SOAP REQUEST SUCCESS:'.
                     "\nSOAP method: ".$method.
                     property_exists($this->soapClient, '__last_request')
-                        ? "\nSOAP request start***".$this->soapClient->__last_request."***SOAP request end"
+                        ? "\nSOAP request start***".$this->soapClient->__last_request.'***SOAP request end'
                         : ''
                 );
             }
@@ -37,11 +37,11 @@ trait SoapRequest
             "\nSOAP method: ".$method.
             (
                 property_exists($this->soapClient, '__last_request')
-                    ? "\nSOAP request start***".$this->soapClient->__last_request."***SOAP request end"
+                    ? "\nSOAP request start***".$this->soapClient->__last_request.'***SOAP request end'
                     : ''
             ).(
                 property_exists($this->soapClient, '__last_request')
-                    ? "\nSOAP response start***: ".$this->soapClient->__last_response."***SOAP response end"
+                    ? "\nSOAP response start***: ".$this->soapClient->__last_response.'***SOAP response end'
                     : ''
             ).
                 "\nTrace: ".json_encode($exception->getTrace());
