@@ -26,7 +26,17 @@ trait VcenterApis
 
     public function getVmInfo(string $vmId)
     {
-        return $this->request('get', "$this->apiUrlPrefix/vcenter/vm/$vmId");
+        $result = $this->request('get', "$this->apiUrlPrefix/vcenter/vm/$vmId");
+
+        if ($this->version < 7) {
+            foreach ($result->disks as $disk) {
+                foreach ($disk->value as $key => $property) {
+                    $disk->$key = $property;
+                }
+            }
+        }
+
+        return $result;
     }
 
     public function deleteVm(string $vmId)
