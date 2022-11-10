@@ -2,9 +2,31 @@
 
 namespace Xelon\VmWareClient\Data;
 
+use Xelon\VmWareClient\Types\CustomizationAdapterMapping;
+use Xelon\VmWareClient\Types\CustomizationFixedIp;
+use Xelon\VmWareClient\Types\CustomizationFixedName;
+use Xelon\VmWareClient\Types\CustomizationGuiUnattended;
+use Xelon\VmWareClient\Types\CustomizationIdentification;
+use Xelon\VmWareClient\Types\CustomizationIPSettings;
+use Xelon\VmWareClient\Types\CustomizationPassword;
+use Xelon\VmWareClient\Types\CustomizationSysprep;
+use Xelon\VmWareClient\Types\CustomizationUserData;
+use Xelon\VmWareClient\Types\Description;
+use Xelon\VmWareClient\Types\DistributedVirtualSwitchPortConnection;
+use Xelon\VmWareClient\Types\SharesInfo;
+use Xelon\VmWareClient\Types\VirtualCdrom;
+use Xelon\VmWareClient\Types\VirtualCdromIsoBackingInfo;
+use Xelon\VmWareClient\Types\VirtualCdromRemoteAtapiBackingInfo;
+use Xelon\VmWareClient\Types\VirtualDeviceConnectInfo;
+use Xelon\VmWareClient\Types\VirtualDisk;
+use Xelon\VmWareClient\Types\VirtualDiskFlatVer2BackingInfo;
+use Xelon\VmWareClient\Types\VirtualEthernetCardDistributedVirtualPortBackingInfo;
+use Xelon\VmWareClient\Types\VirtualLsiLogicSASController;
+use Xelon\VmWareClient\Types\VirtualVmxnet3;
+
 class SoapData
 {
-    public function findVmBody(string $vmId, string $pathSet = ''): array
+    public function objectInfoBody(string $objectId, string $objectType, string $pathSet = ''): array
     {
         return [
             '_this' => [
@@ -13,15 +35,16 @@ class SoapData
             ],
             'specSet' => [
                 'propSet' => [
-                    'type' => 'VirtualMachine',
+                    'type' => $objectType,
                     'all' => ! $pathSet,
                     'pathSet' => $pathSet,
                 ],
                 'objectSet' => [
                     'obj' => [
-                        '_' => $vmId,
-                        'type' => 'VirtualMachine',
+                        '_' => $objectId,
+                        'type' => $objectType,
                     ],
+                    'skip' => false,
                 ],
             ],
         ];
@@ -32,54 +55,62 @@ class SoapData
         int $unitNumber,
         bool $isHdd = false,
         string $name = 'New Hard disk'
-    ): array {
-        return [
-            '@type' => 'VirtualDisk',
+    ): VirtualDisk {
+        return new VirtualDisk([
             'key' => -101,
-            'deviceInfo' => [
-                '@type' => 'Description',
+            'deviceInfo' => new Description([
                 'label' => $name,
                 'summary' => $name,
-            ],
-            'backing' => [
-                '@type' => 'VirtualDiskFlatVer2BackingInfo',
+            ]),
+            'backing' => new VirtualDiskFlatVer2BackingInfo([
                 'fileName' => '',
                 'diskMode' => 'persistent',
                 'thinProvisioned' => false,
                 'eagerlyScrub' => false,
-            ],
+            ]),
             'controllerKey' => 1000,
             'unitNumber' => $unitNumber,
             'capacityInKB' => $capacityInKB,
             'capacityInBytes' => $capacityInKB * 1024,
             'storageIOAllocation' => [
                 'limit' => $isHdd ? 3200 : -1,
-                'shares' => [
-                    '@type' => 'SharesInfo',
+                'shares' => new SharesInfo([
                     'shares' => 1000,
                     'level' => 'normal',
-                ],
+                ]),
             ],
-        ];
+        ]);
     }
 
-    public function editVirtualDiskSpec(array $params): array
+    public function editVirtualDiskSpec(array $params): VirtualDisk
     {
-        return [
-            '@type' => 'VirtualDisk',
+        return new VirtualDisk([
             'key' => $params['key'],
-            'backing' => [
-                '@type' => 'VirtualDiskFlatVer2BackingInfo',
+            'backing' => new VirtualDiskFlatVer2BackingInfo([
                 'fileName' => $params['backing']['fileName'],
                 'diskMode' => $params['backing']['diskMode'] ?? 'persistent',
                 'thinProvisioned' => $params['backing']['thinProvisioned'] ?? false,
                 'eagerlyScrub' => $params['backing']['eagerlyScrub'] ?? false,
-            ],
+            ]),
             'controllerKey' => $params['controllerKey'],
             'unitNumber' => $params['unitNumber'],
             'capacityInKB' => $params['capacityInKB'],
             'capacityInBytes' => $params['capacityInKB'] * 1024,
-        ];
+        ]);
+    }
+
+    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000): VirtualDisk
+    {
+        return new VirtualDisk([
+            'key' => -1,
+            'backing' => new VirtualDiskFlatVer2BackingInfo([
+                'fileName' => $blockStoragePath,
+                'diskMode' => 'independent_persistent',
+            ]),
+            'controllerKey' => $controllerKey,
+            'unitNumber' => -1,
+            'capacityInKB' => $capacityInKB,
+        ]);
     }
 
     public function addNetworkSpec(
@@ -88,20 +119,18 @@ class SoapData
         int $unitNumber,
         int $controllerKey = 100,
         int $key = -1
-    ): array {
-        return [
-            '@type' => 'VirtualVmxnet3',
+    ): VirtualVmxnet3 {
+        return new VirtualVmxnet3([
             'key' => $key,
-            'backing' => [
-                '@type' => 'VirtualEthernetCardDistributedVirtualPortBackingInfo',
-                'port' => [
+            'backing' => new VirtualEthernetCardDistributedVirtualPortBackingInfo([
+                'port' => new DistributedVirtualSwitchPortConnection([
                     'switchUuid' => $switchUuid,
                     'portgroupKey' => $portgroupKey,
-                ],
-            ],
+                ]),
+            ]),
             'controllerKey' => $controllerKey,
             'unitNumber' => $unitNumber,
-        ];
+        ]);
     }
 
     public function editNetworkSpec(
@@ -109,118 +138,104 @@ class SoapData
         string $portgroupKey,
         int $key,
         ?string $macAddress = null
-    ): array {
-        $data = [
-            '@type' => 'VirtualVmxnet3',
+    ): VirtualVmxnet3 {
+        return new VirtualVmxnet3([
             'key' => $key,
-            'backing' => [
-                '@type' => 'VirtualEthernetCardDistributedVirtualPortBackingInfo',
-                'port' => [
+            'backing' => new VirtualEthernetCardDistributedVirtualPortBackingInfo([
+                'port' => new DistributedVirtualSwitchPortConnection([
                     'switchUuid' => $switchUuid,
                     'portgroupKey' => $portgroupKey,
-                ],
-            ],
+                ]),
+            ]),
             'addressType' => 'generated',
             'macAddress' => $macAddress,
-        ];
-
-        if ($macAddress) {
-            $data['macAddress'] = $macAddress;
-        }
-
-        return $data;
+        ]);
     }
 
-    public function addSasControllerSpec()
+    public function addSasControllerSpec(): VirtualLsiLogicSASController
     {
-        return [
-            '@type' => 'VirtualLsiLogicSASController',
+        return new VirtualLsiLogicSASController([
+            'key' => 1000,
             'busNumber' => 1,
             'hotAddRemove' => true,
             'sharedBus' => 'physicalSharing',
-        ];
+        ]);
     }
 
-    public function mountVirtualCdRomSpec(string $fileName, int $key, int $controllerKey, string $datastore): array
+    public function mountVirtualCdRomSpec(string $fileName, int $key, int $controllerKey, string $datastore): VirtualCdrom
     {
-        return [
-            '@type' => 'VirtualCdrom',
+        return new VirtualCdrom([
             'key' => $key,
-            'backing' => [
-                '@type' => 'VirtualCdromIsoBackingInfo',
+            'backing' => new VirtualCdromIsoBackingInfo([
                 'fileName' => $fileName,
                 'datastore' => [
                     'type' => 'Datastore',
                     '_' => $datastore,
                 ],
-            ],
-            'connectable' => [
+            ]),
+            'connectable' => new VirtualDeviceConnectInfo([
                 'startConnected' => true,
                 'allowGuestControl' => true,
                 'connected' => true,
-            ],
+            ]),
             'controllerKey' => $controllerKey,
-        ];
+        ]);
     }
 
-    public function unmountVirtualCdRomSpec(int $key, int $controllerKey): array
+    public function unmountVirtualCdRomSpec(int $key, int $controllerKey): VirtualCdrom
     {
-        return [
-            '@type' => 'VirtualCdrom',
+        return new VirtualCdrom([
             'key' => $key,
-            'backing' => [
-                '@type' => 'VirtualCdromRemoteAtapiBackingInfo',
+            'backing' => new VirtualCdromRemoteAtapiBackingInfo([
                 'deviceName' => 'CDRom',
-            ],
-            'connectable' => [
+            ]),
+            'connectable' => new VirtualDeviceConnectInfo([
                 'startConnected' => false,
                 'allowGuestControl' => false,
                 'connected' => false,
-            ],
+            ]),
             'controllerKey' => $controllerKey,
-        ];
+        ]);
     }
 
-    public function fixedIpAdapterSpec(string $ip, string $subnetMask, array $dnsServerList, array $gateway): array
+    public function fixedIpAdapterSpec(string $ip, string $subnetMask, array $dnsServerList, array $gateway): CustomizationAdapterMapping
     {
-        return [
-            'adapter' => [
-                '@type' => 'CustomizationFixedIp',
-                'ipAddress' => $ip,
-            ],
-            'subnetMask' => $subnetMask,
-            'dnsServerList' => $dnsServerList,
-            'gateway' => $gateway,
-
-        ];
+        return new CustomizationAdapterMapping([
+            'adapter' => new CustomizationIPSettings([
+                'ip' => new CustomizationFixedIp([
+                    'ipAddress' => $ip,
+                ]),
+                'subnetMask' => $subnetMask,
+                'dnsServerList' => $dnsServerList,
+                'gateway' => $gateway,
+            ]),
+        ]);
     }
 
-    public function customizationIdendity(string $hostname, string $license, string $password, string $name): array
+    public function customizationIdendity(string $hostname, string $license, string $password, string $name): CustomizationSysprep
     {
-        return [
-            'type' => 'CustomizationSysprep',
-            'guiUnattended' => [
-                'password' => [
+        return new CustomizationSysprep([
+            'guiUnattended' => new CustomizationGuiUnattended([
+                'password' => new CustomizationPassword([
                     'plainText' => true,
                     'value' => $password,
-                ],
+                ]),
                 'timeZone' => 110,
                 'autoLogon' => true,
                 'autoLogonCount' => 1,
-            ],
-            'userData' => [
+            ]),
+            'userData' => new CustomizationUserData([
                 'fullName' => $name,
                 'orgName' => $name,
-                'computerName' => [
-                    '@type' => 'CustomizationFixedName',
+                'computerName' => new CustomizationFixedName([
                     'name' => $hostname,
-                ],
+                ]),
                 'productId' => $license,
 
-            ],
-            'identification' => [
+            ]),
+            'identification' => new CustomizationIdentification([
                 'joinWorkgroup' => 'workgroup',
-            ],
-        ];
+            ]),
+        ]);
     }
 }

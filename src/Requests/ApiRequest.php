@@ -13,7 +13,13 @@ trait ApiRequest
     private function request(string $method, string $uri, array $options = [])
     {
         try {
-            return json_decode($this->guzzleClient->request($method, $uri, $options)->getBody());
+            $result = json_decode($this->guzzleClient->request($method, $uri, $options)->getBody());
+
+            if ($this->version < 7 && isset($result->value)) {
+                return $result->value;
+            }
+
+            return $result;
         } catch (ConnectException $e) {
             Log::error('Rest api Connect exception: '.$e->getMessage());
         } catch (ServerException $e) {
@@ -24,12 +30,27 @@ trait ApiRequest
             return [
                 'isError' => true,
                 'code' => $e->getCode(),
-                'info' => json_decode($e->getResponse()->getBody()->getContents()),
+                'info' => $this->transformErrorInfo(json_decode($e->getResponse()->getBody()->getContents(), true)),
             ];
         } catch (ClientException $e) {
             // if 401, create new session and reply attempt
         } catch (\Exception $e) {
             Log::error('Rest api exception : '.$e->getMessage());
         }
+    }
+
+    private function transformErrorInfo(array $info)
+    {
+        if ($this->version < 7) {
+            if (isset($info['value']['messages'])) {
+                $info['messages'] = $info['value']['messages'];
+            } elseif (isset($info['localizableMessages'])) {
+                $info['messages'] = $info['localizableMessages'];
+            }
+        } elseif (count($info['messages']) === 0) {
+            $info['messages'][0]['default_message'] = $info['error_type'];
+        }
+
+        return $info;
     }
 }

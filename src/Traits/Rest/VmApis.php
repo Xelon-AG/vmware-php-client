@@ -35,22 +35,36 @@ trait VmApis
 
     public function resetPower(string $vmId)
     {
-        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=reset");
+        return $this->request(
+            'post',
+            $this->version >= 7 ? "/api/vcenter/vm/$vmId/power?action=reset" : "/rest/vcenter/vm/$vmId/power/reset"
+        );
     }
 
     public function startPower(string $vmId)
     {
-        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=start");
+        return $this->request(
+            'post',
+            $this->version >= 7 ? "/api/vcenter/vm/$vmId/power?action=start" : "/rest/vcenter/vm/$vmId/power/start"
+        );
     }
 
     public function stopPower(string $vmId)
     {
-        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=stop");
+        $a = 5;
+
+        return $this->request(
+            'post',
+            $this->version >= 7 ? "/api/vcenter/vm/$vmId/power?action=stop" : "/rest/vcenter/vm/$vmId/power/stop"
+        );
     }
 
     public function suspendPower(string $vmId)
     {
-        return $this->request('post', "/api/vcenter/vm/$vmId/power?action=suspend");
+        return $this->request(
+            'post',
+            $this->version >= 7 ? "/api/vcenter/vm/$vmId/power?action=suspend" : "/rest/vcenter/vm/$vmId/power/suspend"
+        );
     }
 
     public function getTools()
@@ -275,14 +289,21 @@ trait VmApis
         bool $hotAddEnabled = false,
         bool $hotRemoveEnabled = false
     ) {
-        return $this->request('patch', "/api/vcenter/vm/$vmId/hardware/cpu", [
-            'json' => [
-                'cores_per_socket' => $coresPerSocket,
-                'count' => $count,
-                'hot_add_enabled' => $hotAddEnabled,
-                'hot_remove_enabled' => $hotRemoveEnabled,
-            ],
-        ]);
+        $requestBody = [
+            'cores_per_socket' => $coresPerSocket,
+            'count' => $count,
+            'hot_add_enabled' => $hotAddEnabled,
+            'hot_remove_enabled' => $hotRemoveEnabled,
+        ];
+
+        if ($this->version < 7) {
+            $requestBody = ['spec' => $requestBody];
+        }
+
+        return $this->request(
+            'patch',
+            "$this->apiUrlPrefix/vcenter/vm/$vmId/hardware/cpu",
+            ['json' => $requestBody]);
     }
 
     public function listHardwareDisk()
@@ -292,7 +313,7 @@ trait VmApis
 
     public function createHardwareDisk(string $vmId, array $body)
     {
-        return $this->request('post', "/api/vcenter/vm/$vmId/hardware/disk", ['json' => $body]);
+        return $this->request('post', "$this->apiUrlPrefix/vcenter/vm/$vmId/hardware/disk", ['json' => $body]);
     }
 
     public function getHardwareDisk()
@@ -307,7 +328,7 @@ trait VmApis
 
     public function deleteHardwareDisk(string $vmId, int $diskKey)
     {
-        return $this->request('delete', "/api/vcenter/vm/$vmId/hardware/disk/$diskKey");
+        return $this->request('delete', "$this->apiUrlPrefix/vcenter/vm/$vmId/hardware/disk/$diskKey");
     }
 
     public function listHardwareEthernet()
@@ -332,7 +353,7 @@ trait VmApis
 
     public function deleteHardwareEthernet(string $vmId, int $nicKey)
     {
-        return $this->request('delete', "/api/vcenter/vm/$vmId/hardware/ethernet/$nicKey");
+        return $this->request('delete', "$this->apiUrlPrefix/vcenter/vm/$vmId/hardware/ethernet/$nicKey");
     }
 
     public function connectHardwareEthernet()
@@ -387,12 +408,17 @@ trait VmApis
 
     public function updateHardwareMemory(string $vmId, int $size, bool $hotAddEnabled = false)
     {
-        return $this->request('patch', "/api/vcenter/vm/$vmId/hardware/memory", [
-            'json' => [
-                'hot_add_enabled' => $hotAddEnabled,
-                'size_MiB' => $size,
-            ],
-        ]);
+        $requestBody = ['hot_add_enabled' => $hotAddEnabled, 'size_MiB' => $size];
+
+        if ($this->version < 7) {
+            $requestBody = ['spec' => $requestBody];
+        }
+
+        return $this->request(
+            'patch',
+            "$this->apiUrlPrefix/vcenter/vm/$vmId/hardware/memory",
+            ['json' => $requestBody]
+        );
     }
 
     public function listHardwareParallel()

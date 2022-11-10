@@ -24,15 +24,23 @@ class VmWareClientInit
 
     private string $password;
 
+    protected float $version;
+
     protected ?GuzzleClient $guzzleClient;
 
     protected ?\SoapClient $soapClient;
 
-    public function __construct(string $ip, string $login, string $password, string $mode = self::MODE_REST)
-    {
+    public function __construct(
+        string $ip,
+        string $login,
+        string $password,
+        string $mode = self::MODE_REST,
+        float $version = 7
+    ) {
         $this->ip = $ip;
         $this->login = $login;
         $this->password = $password;
+        $this->version = $version;
 
         switch ($mode) {
             case self::MODE_REST:
@@ -68,8 +76,15 @@ class VmWareClientInit
     private function createRestSession(): void
     {
         try {
-            $authReponse = $this->guzzleClient->post('/api/session', ['auth' => [$this->login, $this->password]]);
+            $authReponse = $this->guzzleClient->post(
+                $this->version >= 7 ? '/api/session' : '/rest/com/vmware/cis/session',
+                ['auth' => [$this->login, $this->password]]
+            );
             $apiSessionId = json_decode($authReponse->getBody());
+
+            if ($this->version < 7) {
+                $apiSessionId = $apiSessionId->value;
+            }
 
             Cache::add("vcenter-rest-session-$this->ip", [
                 'api_session_id' => $apiSessionId,
@@ -91,11 +106,10 @@ class VmWareClientInit
     private function deleteRestSession(string $apiSessionId): void
     {
         try {
-            $this->guzzleClient->delete('api/session', [
-                'headers' => [
-                    'vmware-api-session-id' => $apiSessionId,
-                ],
-            ]);
+            $this->guzzleClient->delete(
+                $this->version >= 7 ? 'api/session' : '/rest/com/vmware/cis/session',
+                ['headers' => ['vmware-api-session-id' => $apiSessionId],
+                ]);
         } catch (\Exception $exception) {
         }
 
@@ -158,12 +172,25 @@ class VmWareClientInit
             ];
             $this->soapClient->Login($loginMessage);
 
+            if (isset($this->soapClient->_cookies)) {
+                $soapSessionToken = $this->soapClient->_cookies['vmware_soap_session'][0];
+            } else {
+                $responseHeaders = $this->soapClient->__last_response_headers;
+
+                $string = strstr($responseHeaders, 'vmware_soap_session');
+                $string = strstr($string, '"');
+                $string = ltrim($string, '"');
+                $soapSessionToken = substr($string, 0, strpos($string, '"'));
+                $this->soapClient->__setCookie('vmware_soap_session', $soapSessionToken);
+            }
+
             Cache::add("vcenter-soap-session-$this->ip", [
-                'vmware_soap_session' => $this->soapClient->_cookies['vmware_soap_session'][0],
+                'vmware_soap_session' => $soapSessionToken,
                 'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
             ]);
         } catch (\Exception $e) {
             Log::error('Soap api exception : '.$e->getMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -186,12 +213,16 @@ class VmWareClientInit
 
     private function deleteSoapSession()
     {
-        $sessionManager = new \stdClass();
-        $sessionManager->_ = $sessionManager->type = 'SessionManager';
+        try {
+            Cache::forget("vcenter-soap-session-$this->ip");
 
-        $soaplogout['_this'] = $sessionManager;
-        $this->soapClient->Logout($soaplogout);
+            $sessionManager = new \stdClass();
+            $sessionManager->_ = $sessionManager->type = 'SessionManager';
 
-        Cache::forget("vcenter-soap-session-$this->ip");
+            $soaplogout['_this'] = $sessionManager;
+            $this->soapClient->Logout($soaplogout);
+        } catch (\Exception $exception) {
+            Log::error('Can\'t delete soap session');
+        }
     }
 }
