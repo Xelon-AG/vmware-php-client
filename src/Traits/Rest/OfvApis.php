@@ -10,6 +10,16 @@ trait OfvApis
 
     public function deployLibraryItem(string $ovfLibraryItemId, array $data)
     {
+        $networkMappings = [
+            'value' => $data['network_port_group'],
+            'key' => 'VM Network',
+        ];
+
+        if ($this->version < 7) {
+            $networkMappings = [$networkMappings];
+
+        }
+
         $body = [
             'deployment_spec' => [
                 'name' => $data['name'],
@@ -35,10 +45,7 @@ trait OfvApis
                         ],
                     ],
                 ],
-                'network_mappings' => [
-                    'value' => $data['network_port_group'],
-                    'key' => 'VM Network',
-                ],
+                'network_mappings' => $networkMappings,
             ],
             'target' => [
                 'resource_pool_id' => $data['resource_pool_id'],
