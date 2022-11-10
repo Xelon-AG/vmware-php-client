@@ -155,6 +155,7 @@ class SoapData
     public function addSasControllerSpec(): VirtualLsiLogicSASController
     {
         return new VirtualLsiLogicSASController([
+            'key' => 1000,
             'busNumber' => 1,
             'hotAddRemove' => true,
             'sharedBus' => 'physicalSharing',
