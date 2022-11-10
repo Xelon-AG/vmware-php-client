@@ -17,7 +17,6 @@ trait OfvApis
 
         if ($this->version < 7) {
             $networkMappings = [$networkMappings];
-
         }
 
         $body = [
