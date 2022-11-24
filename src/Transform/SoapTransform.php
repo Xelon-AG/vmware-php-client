@@ -66,8 +66,6 @@ trait SoapTransform
                         $data[] = new SoapVar($this->arrayToSoapVar($childItem), SOAP_ENC_OBJECT, $typeName, null, $key);
                     }
 
-                    // unset($array[$key]);
-
                     $deepArraySet = true;
                 }
 
@@ -111,6 +109,7 @@ trait SoapTransform
             ['layoutEx', 'snapshot'],
             ['layoutEx', 'snapshot', 'disk'],
             ['layoutEx', 'snapshot', 'disk', 'chain'],
+            ['layoutEx', 'snapshot', 'disk', 'chain', 'fileKey'],
             ['snapshot', 'rootSnapshotList'],
             ['snapshot', 'rootSnapshotList', 'childSnapshotList'],
         ];

@@ -86,7 +86,7 @@ class VmWareClientInit
                 $apiSessionId = $apiSessionId->value;
             }
 
-            Cache::add("vcenter-rest-session-$this->ip", [
+            Cache::put("vcenter-rest-session-$this->ip", [
                 'api_session_id' => $apiSessionId,
                 'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
             ]);
@@ -184,7 +184,7 @@ class VmWareClientInit
                 $this->soapClient->__setCookie('vmware_soap_session', $soapSessionToken);
             }
 
-            Cache::add("vcenter-soap-session-$this->ip", [
+            Cache::put("vcenter-soap-session-$this->ip", [
                 'vmware_soap_session' => $soapSessionToken,
                 'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
             ]);

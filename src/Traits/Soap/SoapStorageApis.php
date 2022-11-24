@@ -64,6 +64,7 @@ trait SoapStorageApis
                         'type' => 'Datastore',
                         '_' => $datastore,
                     ],
+                    'provisioningType' => 'thin',
                 ]),
                 'capacityInMB' => $capacityInMB,
             ],

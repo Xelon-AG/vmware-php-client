@@ -306,8 +306,8 @@ trait SoapGuestApis
     ) {
         $body = [
             '_this' => [
-                'type' => 'GuestFileManager',
-                '_' => 'guestOperationsFileManager',
+                'type' => 'GuestProcessManager',
+                '_' => 'guestOperationsProcessManager',
             ],
             'vm' => [
                 'type' => 'VirtualMachine',
