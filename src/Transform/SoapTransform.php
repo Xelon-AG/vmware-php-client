@@ -105,6 +105,7 @@ trait SoapTransform
             ['returnval', 'sampleInfo'],
             ['returnval', 'value', 'value'],
             ['returnval', 'config', 'consumerId'],
+            ['layoutEx', 'disk', 'chain', 'fileKey'],
             ['layoutEx', 'file'],
             ['layoutEx', 'snapshot'],
             ['layoutEx', 'snapshot', 'disk'],
