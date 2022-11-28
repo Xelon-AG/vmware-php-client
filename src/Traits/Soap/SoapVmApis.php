@@ -42,8 +42,9 @@ trait SoapVmApis
             }
         }
 
-        if (!isset($result->returnval->propSet)) {
-            Log::error('Get object info error: ' . json_encode($result));
+        if (! isset($result->returnval->propSet)) {
+            Log::error('Get object info error: '.json_encode($result));
+
             return new \stdClass();
         }
 
