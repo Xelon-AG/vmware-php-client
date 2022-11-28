@@ -42,6 +42,11 @@ trait SoapVmApis
             }
         }
 
+        if (!isset($result->returnval->propSet)) {
+            Log::error('Get object info error: ' . json_encode($result));
+            return new \stdClass();
+        }
+
         return $pathSet
             ? ($result->returnval->propSet->val ?? null)
             : $this->transformPropSet($result->returnval->propSet);
