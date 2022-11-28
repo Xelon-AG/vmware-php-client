@@ -35,7 +35,7 @@ trait ApiRequest
         } catch (ClientException $e) {
             // if 401, create new session and reply attempt
         } catch (\Exception $e) {
-            Log::error('Rest api exception : '.$e->getMessage());
+            Log::error('Rest api exception: '.$e->getMessage());
         }
     }
 
