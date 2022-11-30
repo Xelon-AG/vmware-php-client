@@ -139,7 +139,12 @@ class VmWareClientInit
 
         if (! $sessionInfo) {
             $this->createSoapSession();
-        } elseif ($this->isSessionExpired($sessionInfo['expired_at'])) {
+        } elseif (
+            $this->isSessionExpired($sessionInfo['expired_at'])
+            || Carbon::parse($sessionInfo['expired_at'])->diffInSeconds(Carbon::now()) < 30
+        ) {
+            $this->createSoapClientWithExistingSession($sessionInfo['vmware_soap_session']);
+            $this->deleteSoapSession();
             $this->createSoapSession();
         } else {
             $this->createSoapClientWithExistingSession($sessionInfo['vmware_soap_session']);
@@ -222,7 +227,7 @@ class VmWareClientInit
             $soaplogout['_this'] = $sessionManager;
             $this->soapClient->Logout($soaplogout);
         } catch (\Exception $exception) {
-            Log::error('Can\'t delete soap session');
+            Log::error('Can\'t delete soap session: '.$exception->getMessage());
         }
     }
 }
