@@ -179,9 +179,12 @@ trait SoapTransform
             }
         } else {
             if (isset($object->{$propertyName})) {
-                $object->{$propertyName} = [$object->{$propertyName}];
-                foreach ($object->{$propertyName} as &$nestedObject1) {
-                    $nestedObject1 = $this->transformToArrayValuesRecursive($nestedObject1, $propertyName);
+                if (is_array($object->{$propertyName})) {
+                    foreach ($object->{$propertyName} as &$nestedObject1) {
+                        $nestedObject1 = $this->transformToArrayValuesRecursive($nestedObject1, $propertyName);
+                    }
+                } else {
+                    $object->{$propertyName} = [$this->transformToArrayValuesRecursive($object->{$propertyName}, $propertyName)];
                 }
             }
         }
