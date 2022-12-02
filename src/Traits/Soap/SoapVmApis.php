@@ -122,10 +122,12 @@ trait SoapVmApis
                         'type' => 'Datastore',
                         '_' => $params['spec']['location']['datastore'],
                     ],
-                    'pool' => [
-                        'type' => 'ResourcePool',
-                        '_' => $params['spec']['location']['pool'],
-                    ],
+                    'pool' => (isset($params['spec']['location']['pool']) && $params['spec']['location']['pool'])
+                        ? [
+                            'type' => 'ResourcePool',
+                            '_' => $params['spec']['location']['pool'],
+                        ]
+                        : null,
                 ],
                 'template' => $params['spec']['template'] ?? false,
                 'config' => isset($params['spec']['config'])
