@@ -30,7 +30,7 @@ class VcenterClient extends VmWareClientInit
         parent::__construct($ip, $login, $password, $mode, $version);
 
         if ($mode === self::MODE_SOAP || $mode === self::MODE_BOTH) {
-            $this->soap = new VcenterSoapClient($this->soapClient);
+            $this->soap = new VcenterSoapClient($this->soapClient, $ip);
         }
 
         $this->apiUrlPrefix = $this->version >= 7 ? '/api' : '/rest';
