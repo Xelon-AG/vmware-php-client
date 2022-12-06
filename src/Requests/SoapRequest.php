@@ -73,7 +73,6 @@ trait SoapRequest
             );
             // "\nTrace: ".json_encode($exception->getTrace());
 
-
             Log::error($message);
             throw new \Exception($message);
         }

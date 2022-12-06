@@ -48,6 +48,7 @@ trait ApiRequest
                             'content-type' => 'application/json',
                         ],
                     ]);
+
                     return $this->request($method, $uri, $options);
                 }
             }
