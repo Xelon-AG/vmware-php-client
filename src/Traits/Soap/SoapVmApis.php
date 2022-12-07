@@ -115,10 +115,10 @@ trait SoapVmApis
                         'type' => 'Folder',
                     ],
                     'skip' => false,
-                    'selectSet' => array (
+                    'selectSet' => [
                         new \SoapVar($a, SOAP_ENC_OBJECT, 'TraversalSpec'),
                         new \SoapVar($b, SOAP_ENC_OBJECT, 'TraversalSpec'),
-                    ),
+                    ],
                 ],
             ],
         ];
