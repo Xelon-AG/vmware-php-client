@@ -77,4 +77,13 @@ trait VcenterApis
             ['query' => $this->getListFilterQuery($requestBody)]
         );
     }
+
+    public function getFoldersList(array $requestBody = [])
+    {
+        return $this->request(
+            'get',
+            "$this->apiUrlPrefix/vcenter/folder",
+            ['query' => $this->getListFilterQuery($requestBody)]
+        );
+    }
 }

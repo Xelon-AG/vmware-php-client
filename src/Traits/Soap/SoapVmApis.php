@@ -89,6 +89,45 @@ trait SoapVmApis
         return $this->getObjectInfo($taskHistoryCollectorId, 'TaskHistoryCollector');
     }
 
+    public function getAllVms(string $vmFolder)
+    {
+        $ss1 = new \SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $ss2 = new \SoapVar(['name' => 'DataCenterVMTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $a = ['name' => 'FolderTraversalSpec', 'type' => 'Folder', 'path' => 'childEntity', 'skip' => false, $ss1, $ss2];
+
+        $ss = new \SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $b = ['name' => 'DataCenterVMTraversalSpec', 'type' => 'Datacenter', 'path' => 'vmFolder', 'skip' => false, $ss];
+
+        $body = [
+            '_this' => [
+                '_' => 'propertyCollector',
+                'type' => 'PropertyCollector',
+            ],
+            'specSet' => [
+                'propSet' => [
+                    'type' => 'VirtualMachine',
+                    'all' => true,
+                    'pathSet' => '',
+                ],
+                'objectSet' => [
+                    'obj' => [
+                        '_' => $vmFolder,
+                        'type' => 'Folder',
+                    ],
+                    'skip' => false,
+                    'selectSet' => array (
+                        new \SoapVar($a, SOAP_ENC_OBJECT, 'TraversalSpec'),
+                        new \SoapVar($b, SOAP_ENC_OBJECT, 'TraversalSpec'),
+                    ),
+                ],
+            ],
+        ];
+
+        $result = $this->soapClient->RetrieveProperties($body);
+
+        return $this->transformPropSetArray($result->returnval);
+    }
+
     public function getResourcePoolInfo(?string $resourcePoolId, string $pathSet = '')
     {
         if (! $resourcePoolId) {

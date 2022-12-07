@@ -93,6 +93,17 @@ trait SoapTransform
         return $this->transformToArrayValues($newData);
     }
 
+    public function transformPropSetArray(array $data): array
+    {
+        $newData = [];
+
+        foreach ($data as $item) {
+            $newData[] = $this->transformPropSet($item->propSet);
+        }
+
+        return $newData;
+    }
+
     /**
      * @param  stdClass  $object
      * @return stdClass
