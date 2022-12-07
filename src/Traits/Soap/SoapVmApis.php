@@ -89,7 +89,7 @@ trait SoapVmApis
         return $this->getObjectInfo($taskHistoryCollectorId, 'TaskHistoryCollector');
     }
 
-    public function getAllVms(string $vmFolder)
+    public function getAllVms(string $vmFolder, $pathSet = null)
     {
         $ss1 = new \SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
         $ss2 = new \SoapVar(['name' => 'DataCenterVMTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
@@ -106,8 +106,8 @@ trait SoapVmApis
             'specSet' => [
                 'propSet' => [
                     'type' => 'VirtualMachine',
-                    'all' => true,
-                    'pathSet' => '',
+                    'all' => ! $pathSet,
+                    'pathSet' => $pathSet,
                 ],
                 'objectSet' => [
                     'obj' => [
