@@ -365,7 +365,7 @@ trait SoapVmApis
                 'type' => 'ComputeResource',
             ],
             'spec' => new ClusterConfigSpecEx([
-                'drsConfig' => new ClusterDrsConfigInfo(),
+                // 'drsConfig' => new ClusterDrsConfigInfo(),
                 'rulesSpec' => new ClusterRuleSpec([
                     'operation' => 'add',
                     'info' => new ClusterAntiAffinityRuleSpec([
@@ -375,7 +375,7 @@ trait SoapVmApis
                         'vm' => $vm,
                     ]),
                 ]),
-                'dpmConfig' => new ClusterDpmConfigInfo(),
+                // 'dpmConfig' => new ClusterDpmConfigInfo(),
             ]),
             'modify' => false,
         ];
