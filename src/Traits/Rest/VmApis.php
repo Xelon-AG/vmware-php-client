@@ -142,9 +142,9 @@ trait VmApis
         // TODO:
     }
 
-    public function shutdownGuestPower()
+    public function shutdownGuestPower(string $vmId)
     {
-        // TODO:
+        return $this->request('post', "$this->apiUrlPrefix/vcenter/vm/$vmId/guest/power?action=shutdown");
     }
 
     public function standbyGuestPower()
