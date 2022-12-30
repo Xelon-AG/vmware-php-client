@@ -7,8 +7,6 @@ use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
 use Xelon\VmWareClient\Types\ClusterAntiAffinityRuleSpec;
 use Xelon\VmWareClient\Types\ClusterConfigSpecEx;
-use Xelon\VmWareClient\Types\ClusterDpmConfigInfo;
-use Xelon\VmWareClient\Types\ClusterDrsConfigInfo;
 use Xelon\VmWareClient\Types\ClusterRuleSpec;
 use Xelon\VmWareClient\Types\DVPortgroupConfigSpec;
 use Xelon\VmWareClient\Types\DVPortSetting;
@@ -453,6 +451,18 @@ trait SoapVmApis
             '_this' => [
                 '_' => $folderId,
                 'type' => 'Folder',
+            ],
+        ];
+
+        return $this->request('Destroy_Task', $body);
+    }
+
+    public function deleteVm(string $vmId)
+    {
+        $body = [
+            '_this' => [
+                '_' => $vmId,
+                'type' => 'VirtualMachine',
             ],
         ];
 
