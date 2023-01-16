@@ -137,7 +137,8 @@ class SoapData
         string $switchUuid,
         string $portgroupKey,
         int $key,
-        ?string $macAddress = null
+        ?string $macAddress = null,
+        string $addressType = 'generated'
     ): VirtualVmxnet3 {
         return new VirtualVmxnet3([
             'key' => $key,
@@ -147,7 +148,7 @@ class SoapData
                     'portgroupKey' => $portgroupKey,
                 ]),
             ]),
-            'addressType' => 'generated',
+            'addressType' => $addressType,
             'macAddress' => $macAddress,
         ]);
     }
