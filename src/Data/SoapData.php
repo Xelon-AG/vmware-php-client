@@ -213,7 +213,7 @@ class SoapData
         ]);
     }
 
-    public function customizationIdendity(string $hostname, string $license, string $password, string $name): CustomizationSysprep
+    public function customizationIdendity(string $hostname, ?string $license, string $password, string $name): CustomizationSysprep
     {
         return new CustomizationSysprep([
             'guiUnattended' => new CustomizationGuiUnattended([
