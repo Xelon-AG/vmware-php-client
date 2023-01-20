@@ -12,6 +12,7 @@ use Xelon\VmWareClient\Types\DVPortgroupConfigSpec;
 use Xelon\VmWareClient\Types\DVPortSetting;
 use Xelon\VmWareClient\Types\DVSTrafficShapingPolicy;
 use Xelon\VmWareClient\Types\VirtualDeviceConfigSpec;
+use Xelon\VmWareClient\Types\VirtualDisk;
 use Xelon\VmWareClient\Types\VirtualMachineBootOptionsBootableCdromDevice;
 use Xelon\VmWareClient\Types\VirtualMachineConfigSpec;
 
@@ -217,6 +218,23 @@ trait SoapVmApis
                 'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'edit',
                     'device' => $this->data->editVirtualDiskSpec($params),
+                ]),
+            ]),
+        ];
+
+        return $this->reconfigVmTask($vmId, $body);
+    }
+
+    public function deleteDisk(string $vmId, string $diskKey)
+    {
+        $body = [
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
+                    'operation' => 'remove',
+                    'fileOperation' => 'destroy',
+                    'device' => new VirtualDisk([
+                        'key' => $diskKey
+                    ]),
                 ]),
             ]),
         ];
