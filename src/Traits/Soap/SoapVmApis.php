@@ -233,7 +233,8 @@ trait SoapVmApis
                     'operation' => 'remove',
                     'fileOperation' => 'destroy',
                     'device' => new VirtualDisk([
-                        'key' => $diskKey
+                        'key' => $diskKey,
+                        'capacityInKB' => 0
                     ]),
                 ]),
             ]),
