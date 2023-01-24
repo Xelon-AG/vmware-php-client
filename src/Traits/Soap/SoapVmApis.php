@@ -225,13 +225,13 @@ trait SoapVmApis
         return $this->reconfigVmTask($vmId, $body);
     }
 
-    public function deleteDisk(string $vmId, string $diskKey)
+    public function deleteDisk(string $vmId, string $diskKey, bool $deleteFile = true)
     {
         $body = [
             'spec' => new VirtualMachineConfigSpec([
                 'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'remove',
-                    'fileOperation' => 'destroy',
+                    'fileOperation' => $deleteFile ? 'destroy' : null,
                     'device' => new VirtualDisk([
                         'key' => $diskKey,
                         'capacityInKB' => 0,
