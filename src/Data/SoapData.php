@@ -106,6 +106,7 @@ class SoapData
             'backing' => new VirtualDiskFlatVer2BackingInfo([
                 'fileName' => $blockStoragePath,
                 'diskMode' => 'independent_persistent',
+                'sharing' => 'sharingMultiWriter'
             ]),
             'controllerKey' => $controllerKey,
             'unitNumber' => -1,
