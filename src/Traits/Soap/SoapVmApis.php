@@ -577,4 +577,16 @@ trait SoapVmApis
     {
         return $this->vmRequest('UnmountToolsInstaller', $vmId);
     }
+
+    public function consolidateVmDisks(string $vmId)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+        ];
+
+        return $this->request('ConsolidateVMDisks_Task', $body);
+    }
 }
