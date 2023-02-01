@@ -240,7 +240,7 @@ trait SoapVmApis
                     'device' => new VirtualDisk([
                         'key' => $diskKey,
                         'capacityInKB' => $capacityInKB,
-                        'controllerKey' => $controllerKey
+                        'controllerKey' => $controllerKey,
                     ]),
                 ]),
             ]),
