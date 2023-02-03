@@ -92,4 +92,18 @@ trait SoapStorageApis
 
         return $this->request('ExtendDisk_Task', $body);
     }
+
+    public function registerDisk(string $path, ?string $name = null)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'VcenterVStorageObjectManager',
+                '_' => 'VStorageObjectManager',
+            ],
+            'path' => $path,
+            'name' => $name,
+        ];
+
+        return $this->request('RegisterDisk', $body);
+    }
 }
