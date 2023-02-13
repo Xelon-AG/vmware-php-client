@@ -283,13 +283,21 @@ trait SoapVmApis
         string $switchUuid,
         string $macAddress,
         int $key,
-        string $addressType = 'generated'
+        string $addressType = 'generated',
+        bool $forceConnected = false
     ) {
         $body = [
             'spec' => new VirtualMachineConfigSpec([
                 'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'edit',
-                    'device' => $this->data->editNetworkSpec($switchUuid, $portgroupKey, $key, $macAddress, $addressType),
+                    'device' => $this->data->editNetworkSpec(
+                        $switchUuid,
+                        $portgroupKey,
+                        $key,
+                        $macAddress,
+                        $addressType,
+                        $forceConnected
+                    ),
                 ]),
             ]),
         ];

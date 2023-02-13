@@ -138,7 +138,8 @@ class SoapData
         string $portgroupKey,
         int $key,
         ?string $macAddress = null,
-        string $addressType = 'generated'
+        string $addressType = 'generated',
+        bool $forceConnected = false
     ): VirtualVmxnet3 {
         return new VirtualVmxnet3([
             'key' => $key,
@@ -148,6 +149,13 @@ class SoapData
                     'portgroupKey' => $portgroupKey,
                 ]),
             ]),
+            'connectable' => $forceConnected
+                ? new VirtualDeviceConnectInfo([
+                        'startConnected' => true,
+                        'allowGuestControl' => true,
+                        'connected' => true,
+                    ])
+                : null,
             'addressType' => $addressType,
             'macAddress' => $macAddress,
         ]);
