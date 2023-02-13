@@ -151,10 +151,10 @@ class SoapData
             ]),
             'connectable' => $forceConnected
                 ? new VirtualDeviceConnectInfo([
-                        'startConnected' => true,
-                        'allowGuestControl' => true,
-                        'connected' => true,
-                    ])
+                    'startConnected' => true,
+                    'allowGuestControl' => true,
+                    'connected' => true,
+                ])
                 : null,
             'addressType' => $addressType,
             'macAddress' => $macAddress,
