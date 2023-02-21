@@ -249,7 +249,7 @@ trait SoapVmApis
         return $this->reconfigVmTask($vmId, $body);
     }
 
-    public function addPersistantDisk(string $vmId, string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000)
+    public function addPersistantDisk(string $vmId, string $blockStoragePath, int $capacityInKB, int $controllerKey = 1001)
     {
         $body = [
             'spec' => new VirtualMachineConfigSpec([

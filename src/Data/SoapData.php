@@ -99,7 +99,7 @@ class SoapData
         ]);
     }
 
-    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000): VirtualDisk
+    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1001): VirtualDisk
     {
         return new VirtualDisk([
             'key' => -1,
