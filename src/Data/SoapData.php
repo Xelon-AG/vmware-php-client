@@ -99,7 +99,7 @@ class SoapData
         ]);
     }
 
-    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1001): VirtualDisk
+    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000): VirtualDisk
     {
         return new VirtualDisk([
             'key' => -1,
@@ -221,14 +221,13 @@ class SoapData
         ]);
     }
 
-    public function customizationIdendity(string $hostname, ?string $license, string $password, string $name): CustomizationSysprep
+    public function customizationIdendity(string $hostname, ?string $license, ?string $password, string $name): CustomizationSysprep
     {
         return new CustomizationSysprep([
             'guiUnattended' => new CustomizationGuiUnattended([
-                'password' => new CustomizationPassword([
-                    'plainText' => true,
-                    'value' => $password,
-                ]),
+                'password' => $password
+                    ? new CustomizationPassword(['plainText' => true, 'value' => $password])
+                    : null,
                 'timeZone' => 110,
                 'autoLogon' => true,
                 'autoLogonCount' => 1,
