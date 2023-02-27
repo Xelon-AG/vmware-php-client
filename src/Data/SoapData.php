@@ -99,8 +99,12 @@ class SoapData
         ]);
     }
 
-    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000): VirtualDisk
-    {
+    public function addBlockStorageSpec(
+        string $blockStoragePath,
+        int $capacityInKB,
+        int $unitNumber = -1,
+        int $controllerKey = 1000
+    ): VirtualDisk {
         return new VirtualDisk([
             'key' => -1,
             'backing' => new VirtualDiskFlatVer2BackingInfo([
@@ -108,7 +112,7 @@ class SoapData
                 'diskMode' => 'independent_persistent',
             ]),
             'controllerKey' => $controllerKey,
-            'unitNumber' => -1,
+            'unitNumber' => $unitNumber,
             'capacityInKB' => $capacityInKB,
         ]);
     }
