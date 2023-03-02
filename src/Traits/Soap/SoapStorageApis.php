@@ -106,4 +106,24 @@ trait SoapStorageApis
 
         return $this->request('RegisterDisk', $body);
     }
+
+    public function clearVStorageObjectControlFlags(string $vstorageId, string $datastore, array $controlFlags)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'VcenterVStorageObjectManager',
+                '_' => 'VStorageObjectManager',
+            ],
+            'id' => [
+                'id' => $vstorageId,
+            ],
+            'datastore' => [
+                'type' => 'Datastore',
+                '_' => $datastore,
+            ],
+            'controlFlags' => $controlFlags,
+        ];
+
+        return $this->request('ClearVStorageObjectControlFlags', $body);
+    }
 }
