@@ -58,7 +58,7 @@ trait SoapTransform
                                 continue;
                             }
                         } else {
-                            $data[$key] = new SoapVar($childItem, null, null, null, $key);
+                            $data[] = new SoapVar($childItem, null, null, null, $key);
 
                             continue;
                         }
