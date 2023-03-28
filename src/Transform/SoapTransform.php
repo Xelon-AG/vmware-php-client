@@ -98,7 +98,7 @@ trait SoapTransform
         $newData = [];
 
         foreach ($data as $item) {
-            $newData[] = $this->transformPropSet($item->propSet);
+            $newData[] = $this->transformPropSet(is_array($item->propSet) ? $item->propSet : [$item->propSet]);
         }
 
         return $newData;
