@@ -124,7 +124,7 @@ trait SoapVmApis
 
         $result = $this->soapClient->RetrieveProperties($body);
 
-        return $this->transformPropSetArray($result->returnval);
+        return $this->transformPropSetArray($result->returnval ?? []);
     }
 
     public function getResourcePoolInfo(?string $resourcePoolId, string $pathSet = '')
