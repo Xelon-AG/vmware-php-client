@@ -107,7 +107,7 @@ trait SoapStorageApis
         return $this->request('RegisterDisk', $body);
     }
 
-    public function clearVStorageObjectControlFlags(string $vstorageId, string $datastore, array $controlFlags)
+    public function clearVStorageObjectControlFlag(string $vstorageId, string $datastore, string $controlFlag)
     {
         $body = [
             '_this' => [
@@ -121,7 +121,7 @@ trait SoapStorageApis
                 'type' => 'Datastore',
                 '_' => $datastore,
             ],
-            'controlFlags' => $controlFlags,
+            'controlFlags' => $controlFlag,
         ];
 
         return $this->request('ClearVStorageObjectControlFlags', $body);
