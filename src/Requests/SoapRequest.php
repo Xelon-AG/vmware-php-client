@@ -40,7 +40,7 @@ trait SoapRequest
                     ? "\nSOAP request start***".$this->soapClient->__last_request.'***SOAP request end'
                     : ''
             ).(
-                property_exists($this->soapClient, '__last_request')
+                property_exists($this->soapClient, '__last_response')
                     ? "\nSOAP response start***: ".$this->soapClient->__last_response.'***SOAP response end'
                     : ''
             );

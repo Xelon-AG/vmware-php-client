@@ -33,7 +33,7 @@ trait SoapTransform
                     unset($value['@type']);
                 }
 
-                if (array_key_exists('type', $value)) {
+                if (array_key_exists('_', $value) && array_key_exists('type', $value)) {
                     $data[$key] = new SoapVar($value['_'], null, $value['type'], '', $key, '');
 
                     continue;
@@ -52,7 +52,7 @@ trait SoapTransform
                                 unset($childItem['@type']);
                             }
 
-                            if (array_key_exists('type', $childItem)) {
+                            if (array_key_exists('_', $childItem) && array_key_exists('type', $childItem)) {
                                 $data[$key] = new SoapVar($childItem['_'], null, $childItem['type'], '', $key, '');
 
                                 continue;
