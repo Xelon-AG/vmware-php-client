@@ -94,7 +94,6 @@ trait SoapTransform
     }
 
     /**
-     * @param  stdClass  $object
      * @return stdClass
      * This function transform to array objects that should be array type
      */

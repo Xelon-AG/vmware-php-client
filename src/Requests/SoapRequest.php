@@ -11,9 +11,6 @@ trait SoapRequest
     use SoapTransform;
 
     /**
-     * @param  string  $method
-     * @param  array  $requestBody
-     * @param  bool  $convertToSoap
      * @return stdClass
      */
     public function request(string $method, array $requestBody, bool $convertToSoap = true)
@@ -52,9 +49,6 @@ trait SoapRequest
     }
 
     /**
-     * @param  string  $method
-     * @param  string  $vmId
-     * @param  array  $requestBody
      * @return stdClass
      */
     private function vmRequest(string $method, string $vmId, array $requestBody = [])
