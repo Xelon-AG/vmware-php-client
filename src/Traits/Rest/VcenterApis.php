@@ -28,7 +28,7 @@ trait VcenterApis
     {
         $result = $this->request('get', "$this->apiUrlPrefix/vcenter/vm/$vmId");
 
-        if ($this->version < 7) {
+        if ($this->version < 7 && isset($result->disks)) {
             foreach ($result->disks as $disk) {
                 foreach ($disk->value as $key => $property) {
                     $disk->$key = $property;
@@ -74,6 +74,15 @@ trait VcenterApis
         return $this->request(
             'get',
             "$this->apiUrlPrefix/vcenter/network",
+            ['query' => $this->getListFilterQuery($requestBody)]
+        );
+    }
+
+    public function getFoldersList(array $requestBody = [])
+    {
+        return $this->request(
+            'get',
+            "$this->apiUrlPrefix/vcenter/folder",
             ['query' => $this->getListFilterQuery($requestBody)]
         );
     }

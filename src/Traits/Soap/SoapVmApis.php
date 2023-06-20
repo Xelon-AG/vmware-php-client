@@ -7,13 +7,12 @@ use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
 use Xelon\VmWareClient\Types\ClusterAntiAffinityRuleSpec;
 use Xelon\VmWareClient\Types\ClusterConfigSpecEx;
-use Xelon\VmWareClient\Types\ClusterDpmConfigInfo;
-use Xelon\VmWareClient\Types\ClusterDrsConfigInfo;
 use Xelon\VmWareClient\Types\ClusterRuleSpec;
 use Xelon\VmWareClient\Types\DVPortgroupConfigSpec;
 use Xelon\VmWareClient\Types\DVPortSetting;
 use Xelon\VmWareClient\Types\DVSTrafficShapingPolicy;
 use Xelon\VmWareClient\Types\VirtualDeviceConfigSpec;
+use Xelon\VmWareClient\Types\VirtualDisk;
 use Xelon\VmWareClient\Types\VirtualMachineBootOptionsBootableCdromDevice;
 use Xelon\VmWareClient\Types\VirtualMachineConfigSpec;
 
@@ -32,7 +31,7 @@ trait SoapVmApis
             Log::error(
                 "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
                 "\nSOAP request: ".$this->soapClient->__last_request.
-                "\nSOAP response: ".$this->soapClient->__last_response
+                "\nSOAP response: ".$this->soapClient->__last_response ?? ''
             );
 
             if (array_keys(json_decode(json_encode($exception->detail), true))[0] === 'ManagedObjectNotFoundFault') {
@@ -89,6 +88,45 @@ trait SoapVmApis
         return $this->getObjectInfo($taskHistoryCollectorId, 'TaskHistoryCollector');
     }
 
+    public function getAllVms(string $vmFolder, $pathSet = null)
+    {
+        $ss1 = new \SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $ss2 = new \SoapVar(['name' => 'DataCenterVMTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $a = ['name' => 'FolderTraversalSpec', 'type' => 'Folder', 'path' => 'childEntity', 'skip' => false, $ss1, $ss2];
+
+        $ss = new \SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $b = ['name' => 'DataCenterVMTraversalSpec', 'type' => 'Datacenter', 'path' => 'vmFolder', 'skip' => false, $ss];
+
+        $body = [
+            '_this' => [
+                '_' => 'propertyCollector',
+                'type' => 'PropertyCollector',
+            ],
+            'specSet' => [
+                'propSet' => [
+                    'type' => 'VirtualMachine',
+                    'all' => ! $pathSet,
+                    'pathSet' => $pathSet,
+                ],
+                'objectSet' => [
+                    'obj' => [
+                        '_' => $vmFolder,
+                        'type' => 'Folder',
+                    ],
+                    'skip' => false,
+                    'selectSet' => [
+                        new \SoapVar($a, SOAP_ENC_OBJECT, 'TraversalSpec'),
+                        new \SoapVar($b, SOAP_ENC_OBJECT, 'TraversalSpec'),
+                    ],
+                ],
+            ],
+        ];
+
+        $result = $this->soapClient->RetrieveProperties($body);
+
+        return $this->transformPropSetArray($result->returnval ?? []);
+    }
+
     public function getResourcePoolInfo(?string $resourcePoolId, string $pathSet = '')
     {
         if (! $resourcePoolId) {
@@ -122,10 +160,12 @@ trait SoapVmApis
                         'type' => 'Datastore',
                         '_' => $params['spec']['location']['datastore'],
                     ],
-                    'pool' => [
-                        'type' => 'ResourcePool',
-                        '_' => $params['spec']['location']['pool'],
-                    ],
+                    'pool' => (isset($params['spec']['location']['pool']) && $params['spec']['location']['pool'])
+                        ? [
+                            'type' => 'ResourcePool',
+                            '_' => $params['spec']['location']['pool'],
+                        ]
+                        : null,
                 ],
                 'template' => $params['spec']['template'] ?? false,
                 'config' => isset($params['spec']['config'])
@@ -185,13 +225,47 @@ trait SoapVmApis
         return $this->reconfigVmTask($vmId, $body);
     }
 
-    public function addPersistantDisk(string $vmId, string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000)
-    {
+    public function deleteDisk(
+        string $vmId,
+        string $diskKey,
+        bool $deleteFile = true,
+        int $capacityInKB = 0,
+        int $controllerKey = 1000
+    ) {
+        $body = [
+            'spec' => new VirtualMachineConfigSpec([
+                'deviceChange' => new VirtualDeviceConfigSpec([
+                    'operation' => 'remove',
+                    'fileOperation' => $deleteFile ? 'destroy' : null,
+                    'device' => new VirtualDisk([
+                        'key' => $diskKey,
+                        'capacityInKB' => $capacityInKB,
+                        'controllerKey' => $controllerKey,
+                    ]),
+                ]),
+            ]),
+        ];
+
+        return $this->reconfigVmTask($vmId, $body);
+    }
+
+    public function addPersistantDisk(
+        string $vmId,
+        string $blockStoragePath,
+        int $capacityInKB,
+        int $unitNumber = -1,
+        int $controllerKey = 1000
+    ) {
         $body = [
             'spec' => new VirtualMachineConfigSpec([
                 'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'add',
-                    'device' => $this->data->addBlockStorageSpec($blockStoragePath, $capacityInKB, $controllerKey),
+                    'device' => $this->data->addBlockStorageSpec(
+                        $blockStoragePath,
+                        $capacityInKB,
+                        $unitNumber,
+                        $controllerKey
+                    ),
                 ]),
             ]),
         ];
@@ -218,13 +292,22 @@ trait SoapVmApis
         string $portgroupKey,
         string $switchUuid,
         string $macAddress,
-        int $key
+        int $key,
+        string $addressType = 'generated',
+        bool $forceConnected = false
     ) {
         $body = [
             'spec' => new VirtualMachineConfigSpec([
                 'deviceChange' => new VirtualDeviceConfigSpec([
                     'operation' => 'edit',
-                    'device' => $this->data->editNetworkSpec($switchUuid, $portgroupKey, $key, $macAddress),
+                    'device' => $this->data->editNetworkSpec(
+                        $switchUuid,
+                        $portgroupKey,
+                        $key,
+                        $macAddress,
+                        $addressType,
+                        $forceConnected
+                    ),
                 ]),
             ]),
         ];
@@ -324,7 +407,7 @@ trait SoapVmApis
                 'type' => 'ComputeResource',
             ],
             'spec' => new ClusterConfigSpecEx([
-                'drsConfig' => new ClusterDrsConfigInfo(),
+                // 'drsConfig' => new ClusterDrsConfigInfo(),
                 'rulesSpec' => new ClusterRuleSpec([
                     'operation' => 'add',
                     'info' => new ClusterAntiAffinityRuleSpec([
@@ -334,7 +417,7 @@ trait SoapVmApis
                         'vm' => $vm,
                     ]),
                 ]),
-                'dpmConfig' => new ClusterDpmConfigInfo(),
+                // 'dpmConfig' => new ClusterDpmConfigInfo(),
             ]),
             'modify' => false,
         ];
@@ -412,6 +495,18 @@ trait SoapVmApis
             '_this' => [
                 '_' => $folderId,
                 'type' => 'Folder',
+            ],
+        ];
+
+        return $this->request('Destroy_Task', $body);
+    }
+
+    public function deleteVm(string $vmId)
+    {
+        $body = [
+            '_this' => [
+                '_' => $vmId,
+                'type' => 'VirtualMachine',
             ],
         ];
 
@@ -505,5 +600,17 @@ trait SoapVmApis
     public function unmountToolsInstaller(string $vmId)
     {
         return $this->vmRequest('UnmountToolsInstaller', $vmId);
+    }
+
+    public function consolidateVmDisks(string $vmId)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'VirtualMachine',
+                '_' => $vmId,
+            ],
+        ];
+
+        return $this->request('ConsolidateVMDisks_Task', $body);
     }
 }

@@ -92,4 +92,58 @@ trait SoapStorageApis
 
         return $this->request('ExtendDisk_Task', $body);
     }
+
+    public function registerDisk(string $path, ?string $name = null)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'VcenterVStorageObjectManager',
+                '_' => 'VStorageObjectManager',
+            ],
+            'path' => $path,
+            'name' => $name,
+        ];
+
+        return $this->request('RegisterDisk', $body);
+    }
+
+    public function clearVStorageObjectControlFlag(string $vstorageId, string $datastore, string $controlFlag)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'VcenterVStorageObjectManager',
+                '_' => 'VStorageObjectManager',
+            ],
+            'id' => [
+                'id' => $vstorageId,
+            ],
+            'datastore' => [
+                'type' => 'Datastore',
+                '_' => $datastore,
+            ],
+            'controlFlags' => $controlFlag,
+        ];
+
+        return $this->request('ClearVStorageObjectControlFlags', $body);
+    }
+
+    public function setVStorageObjectControlFlags(string $vstorageId, string $datastore, array $controlFlags)
+    {
+        $body = [
+            '_this' => [
+                'type' => 'VcenterVStorageObjectManager',
+                '_' => 'VStorageObjectManager',
+            ],
+            'id' => [
+                'id' => $vstorageId,
+            ],
+            'datastore' => [
+                'type' => 'Datastore',
+                '_' => $datastore,
+            ],
+            'controlFlags' => $controlFlags,
+        ];
+
+        return $this->request('SetVStorageObjectControlFlags', $body);
+    }
 }

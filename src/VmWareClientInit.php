@@ -18,7 +18,7 @@ class VmWareClientInit
 
     public const MODE_BOTH = 'both';
 
-    private string $ip;
+    protected string $ip;
 
     private string $login;
 

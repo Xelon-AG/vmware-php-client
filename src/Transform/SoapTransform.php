@@ -33,7 +33,7 @@ trait SoapTransform
                     unset($value['@type']);
                 }
 
-                if (array_key_exists('type', $value)) {
+                if (array_key_exists('_', $value) && array_key_exists('type', $value)) {
                     $data[$key] = new SoapVar($value['_'], null, $value['type'], '', $key, '');
 
                     continue;
@@ -52,13 +52,13 @@ trait SoapTransform
                                 unset($childItem['@type']);
                             }
 
-                            if (array_key_exists('type', $childItem)) {
+                            if (array_key_exists('_', $childItem) && array_key_exists('type', $childItem)) {
                                 $data[$key] = new SoapVar($childItem['_'], null, $childItem['type'], '', $key, '');
 
                                 continue;
                             }
                         } else {
-                            $data[$key] = new SoapVar($childItem, null, null, null, $key);
+                            $data[] = new SoapVar($childItem, null, null, null, $key);
 
                             continue;
                         }
@@ -93,8 +93,18 @@ trait SoapTransform
         return $this->transformToArrayValues($newData);
     }
 
+    public function transformPropSetArray(array $data): array
+    {
+        $newData = [];
+
+        foreach ($data as $item) {
+            $newData[] = $this->transformPropSet(is_array($item->propSet) ? $item->propSet : [$item->propSet]);
+        }
+
+        return $newData;
+    }
+
     /**
-     * @param  stdClass  $object
      * @return stdClass
      * This function transform to array objects that should be array type
      */
@@ -105,6 +115,8 @@ trait SoapTransform
             ['returnval', 'sampleInfo'],
             ['returnval', 'value', 'value'],
             ['returnval', 'config', 'consumerId'],
+            ['layoutEx', 'disk'],
+            ['layoutEx', 'disk', 'chain'],
             ['layoutEx', 'disk', 'chain', 'fileKey'],
             ['layoutEx', 'file'],
             ['layoutEx', 'snapshot'],
@@ -177,9 +189,12 @@ trait SoapTransform
             }
         } else {
             if (isset($object->{$propertyName})) {
-                $object->{$propertyName} = [$object->{$propertyName}];
-                foreach ($object->{$propertyName} as &$nestedObject1) {
-                    $nestedObject1 = $this->transformToArrayValuesRecursive($nestedObject1, $propertyName);
+                if (is_array($object->{$propertyName})) {
+                    foreach ($object->{$propertyName} as &$nestedObject1) {
+                        $nestedObject1 = $this->transformToArrayValuesRecursive($nestedObject1, $propertyName);
+                    }
+                } else {
+                    $object->{$propertyName} = [$this->transformToArrayValuesRecursive($object->{$propertyName}, $propertyName)];
                 }
             }
         }

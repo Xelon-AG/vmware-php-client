@@ -99,8 +99,12 @@ class SoapData
         ]);
     }
 
-    public function addBlockStorageSpec(string $blockStoragePath, int $capacityInKB, int $controllerKey = 1000): VirtualDisk
-    {
+    public function addBlockStorageSpec(
+        string $blockStoragePath,
+        int $capacityInKB,
+        int $unitNumber = -1,
+        int $controllerKey = 1000
+    ): VirtualDisk {
         return new VirtualDisk([
             'key' => -1,
             'backing' => new VirtualDiskFlatVer2BackingInfo([
@@ -108,7 +112,7 @@ class SoapData
                 'diskMode' => 'independent_persistent',
             ]),
             'controllerKey' => $controllerKey,
-            'unitNumber' => -1,
+            'unitNumber' => $unitNumber,
             'capacityInKB' => $capacityInKB,
         ]);
     }
@@ -137,7 +141,9 @@ class SoapData
         string $switchUuid,
         string $portgroupKey,
         int $key,
-        ?string $macAddress = null
+        ?string $macAddress = null,
+        string $addressType = 'generated',
+        bool $forceConnected = false
     ): VirtualVmxnet3 {
         return new VirtualVmxnet3([
             'key' => $key,
@@ -147,7 +153,14 @@ class SoapData
                     'portgroupKey' => $portgroupKey,
                 ]),
             ]),
-            'addressType' => 'generated',
+            'connectable' => $forceConnected
+                ? new VirtualDeviceConnectInfo([
+                    'startConnected' => true,
+                    'allowGuestControl' => true,
+                    'connected' => true,
+                ])
+                : null,
+            'addressType' => $addressType,
             'macAddress' => $macAddress,
         ]);
     }
@@ -212,14 +225,13 @@ class SoapData
         ]);
     }
 
-    public function customizationIdendity(string $hostname, string $license, string $password, string $name): CustomizationSysprep
+    public function customizationIdendity(string $hostname, ?string $license, ?string $password, string $name): CustomizationSysprep
     {
         return new CustomizationSysprep([
             'guiUnattended' => new CustomizationGuiUnattended([
-                'password' => new CustomizationPassword([
-                    'plainText' => true,
-                    'value' => $password,
-                ]),
+                'password' => $password
+                    ? new CustomizationPassword(['plainText' => true, 'value' => $password])
+                    : null,
                 'timeZone' => 110,
                 'autoLogon' => true,
                 'autoLogonCount' => 1,

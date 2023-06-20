@@ -142,9 +142,9 @@ trait VmApis
         // TODO:
     }
 
-    public function shutdownGuestPower()
+    public function shutdownGuestPower(string $vmId)
     {
-        // TODO:
+        return $this->request('post', "$this->apiUrlPrefix/vcenter/vm/$vmId/guest/power?action=shutdown");
     }
 
     public function standbyGuestPower()
@@ -326,7 +326,7 @@ trait VmApis
         // TODO:
     }
 
-    public function deleteHardwareDisk(string $vmId, int $diskKey)
+    public function detachHardwareDisk(string $vmId, int $diskKey)
     {
         return $this->request('delete', "$this->apiUrlPrefix/vcenter/vm/$vmId/hardware/disk/$diskKey");
     }
