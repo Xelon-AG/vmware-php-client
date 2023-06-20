@@ -5,6 +5,7 @@ namespace Xelon\VmWareClient\Requests;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use stdClass;
+use Xelon\VmWareClient\Events\RequestEvent;
 use Xelon\VmWareClient\Transform\SoapTransform;
 
 trait SoapRequest
@@ -23,6 +24,12 @@ trait SoapRequest
         try {
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
 
+            RequestEvent::dispatch(
+                property_exists($this->soapClient, '__last_request') ? $this->soapClient->__last_request : '',
+                property_exists($this->soapClient, '__last_response') ? $this->soapClient->__last_response : '',
+                true
+            );
+
             if (config('vmware-php-client.enable_logs')) {
                 Log::info(
                     'SOAP REQUEST SUCCESS:'.
@@ -35,6 +42,12 @@ trait SoapRequest
 
             return $response;
         } catch (\Exception $exception) {
+            RequestEvent::dispatch(
+                property_exists($this->soapClient, '__last_request') ? $this->soapClient->__last_request : '',
+                property_exists($this->soapClient, '__last_response') ? $this->soapClient->__last_response : '',
+                false
+            );
+
             if ($exception->getMessage() === 'The session is not authenticated.' && $this->tries < $this->maxTries) {
                 $this->tries++;
                 $sessionInfo = Cache::get("vcenter-soap-session-$this->ip");
@@ -64,7 +77,7 @@ trait SoapRequest
                     ? "\nSOAP request start***".$this->soapClient->__last_request.'***SOAP request end'
                     : ''
             ).(
-                property_exists($this->soapClient, '__last_request')
+                property_exists($this->soapClient, '__last_response')
                     ? "\nSOAP response start***: ".$this->soapClient->__last_response.'***SOAP response end'
                     : ''
             );
