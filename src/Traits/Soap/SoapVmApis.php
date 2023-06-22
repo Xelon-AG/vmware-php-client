@@ -30,8 +30,8 @@ trait SoapVmApis
         } catch (\Exception $exception) {
             Log::error(
                 "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
-                "\nSOAP request: ".$this->soapClient->__last_request.
-                "\nSOAP response: ".$this->soapClient->__last_response ?? ''
+                "\nSOAP request: ".($this->soapClient->__getLastRequest() ?? '').
+                "\nSOAP response: ".($this->soapClient->__getLastResponse() ?? '')
             );
 
             if (array_keys(json_decode(json_encode($exception->detail), true))[0] === 'ManagedObjectNotFoundFault') {

@@ -177,10 +177,10 @@ class VmWareClientInit
             ];
             $this->soapClient->Login($loginMessage);
 
-            if (isset($this->soapClient->_cookies)) {
-                $soapSessionToken = $this->soapClient->_cookies['vmware_soap_session'][0];
+            if (array_key_exists('vmware_soap_session', $this->soapClient->__getCookies())) {
+                $soapSessionToken = $this->soapClient->__getCookies()['vmware_soap_session'][0];
             } else {
-                $responseHeaders = $this->soapClient->__last_response_headers;
+                $responseHeaders = $this->soapClient->__getLastResponseHeaders();
 
                 $string = strstr($responseHeaders, 'vmware_soap_session');
                 $string = strstr($string, '"');
