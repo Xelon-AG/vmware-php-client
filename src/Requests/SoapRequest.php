@@ -73,13 +73,13 @@ trait SoapRequest
             $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
                 "\nSOAP method: ".$method.
                 (
-                $this->soapClient->__getLastRequest()
-                    ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
-                    : ''
+                    $this->soapClient->__getLastRequest()
+                        ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
+                        : ''
                 ).(
-                $this->soapClient->__getLastResponse()
-                    ? "\nSOAP response start***: ".$this->soapClient->__getLastResponse().'***SOAP response end'
-                    : ''
+                    $this->soapClient->__getLastResponse()
+                        ? "\nSOAP response start***: ".$this->soapClient->__getLastResponse().'***SOAP response end'
+                        : ''
                 );
             // "\nTrace: ".json_encode($exception->getTrace());
 
