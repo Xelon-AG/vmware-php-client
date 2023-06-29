@@ -35,7 +35,7 @@ trait SoapRequest
                     'SOAP REQUEST SUCCESS:'.
                     "\nSOAP method: ".$method.
                     property_exists($this->soapClient, '__last_request')
-                        ? "\nSOAP request start***".preg_replace("#<password>.+</password>#", '<password>*****</password>', $this->soapClient->__last_request).'***SOAP request end'
+                        ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__last_request).'***SOAP request end'
                         : ''
                 );
             }
@@ -74,7 +74,7 @@ trait SoapRequest
             "\nSOAP method: ".$method.
             (
                 property_exists($this->soapClient, '__last_request')
-                    ? "\nSOAP request start***".preg_replace("#<password>.+</password>#", '<password>*****</password>', $this->soapClient->__last_request).'***SOAP request end'
+                    ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__last_request).'***SOAP request end'
                     : ''
             ).(
                 property_exists($this->soapClient, '__last_response')
