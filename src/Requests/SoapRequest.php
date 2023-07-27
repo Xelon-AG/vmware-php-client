@@ -103,4 +103,61 @@ trait SoapRequest
 
         return $this->request($method, $soapMessage);
     }
+
+    /*
+     * Totally not stolen from https://stackoverflow.com/a/46349713
+     */
+    private function parseXMLResponse(string $xmlResponse)
+    {
+        $previous_value = libxml_use_internal_errors(true);
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->preserveWhiteSpace = false;
+        $dom->loadXml($xmlResponse);
+        libxml_use_internal_errors($previous_value);
+
+        if (libxml_get_errors()) {
+            return [];
+        }
+
+        return $this->domToArray($dom);
+    }
+
+    private function domToArray($root) {
+        $result = [];
+
+        if ($root->hasAttributes()) {
+            $attrs = $root->attributes;
+            foreach ($attrs as $attr) {
+                $result['@attributes'][$attr->name] = $attr->value;
+            }
+        }
+
+        if ($root->hasChildNodes()) {
+            $children = $root->childNodes;
+            if ($children->length == 1) {
+                $child = $children->item(0);
+                if (in_array($child->nodeType,[XML_TEXT_NODE,XML_CDATA_SECTION_NODE])) {
+                    $result['_value'] = $child->nodeValue;
+                    return count($result) == 1
+                        ? $result['_value']
+                        : $result;
+                }
+
+            }
+            $groups = [];
+            foreach ($children as $child) {
+                if (!isset($result[$child->nodeName])) {
+                    $result[$child->nodeName] = $this->domToArray($child);
+                } else {
+                    if (!isset($groups[$child->nodeName])) {
+                        $result[$child->nodeName] = [$result[$child->nodeName]];
+                        $groups[$child->nodeName] = 1;
+                    }
+                    $result[$child->nodeName][] = $this->domToArray($child);
+                }
+            }
+        }
+
+        return $result;
+    }
 }
