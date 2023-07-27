@@ -28,7 +28,7 @@ class VmWareClientInit
 
     protected ?GuzzleClient $guzzleClient;
 
-    protected ?\SoapClient $soapClient;
+    public ?\SoapClient $soapClient;
 
     public function __construct(
         string $ip,
