@@ -25,8 +25,8 @@ trait SoapRequest
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
 
             RequestEvent::dispatch(
-                property_exists($this->soapClient, '__last_request') ? $this->soapClient->__last_request : '',
-                property_exists($this->soapClient, '__last_response') ? $this->soapClient->__last_response : '',
+                $this->soapClient->__getLastRequest() ?? '',
+                $this->soapClient->__getLastResponse() ?? '',
                 true
             );
 
@@ -34,8 +34,8 @@ trait SoapRequest
                 Log::info(
                     'SOAP REQUEST SUCCESS:'.
                     "\nSOAP method: ".$method.
-                    property_exists($this->soapClient, '__last_request')
-                        ? "\nSOAP request start***".$this->soapClient->__last_request.'***SOAP request end'
+                    $this->soapClient->__getLastRequest()
+                        ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
                         : ''
                 );
             }
@@ -43,8 +43,8 @@ trait SoapRequest
             return $response;
         } catch (\Exception $exception) {
             RequestEvent::dispatch(
-                property_exists($this->soapClient, '__last_request') ? $this->soapClient->__last_request : '',
-                property_exists($this->soapClient, '__last_response') ? $this->soapClient->__last_response : '',
+                $this->soapClient->__getLastRequest() ?? '',
+                $this->soapClient->__getLastResponse() ?? '',
                 false
             );
 
@@ -71,16 +71,16 @@ trait SoapRequest
             }
 
             $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
-            "\nSOAP method: ".$method.
-            (
-                property_exists($this->soapClient, '__last_request')
-                    ? "\nSOAP request start***".$this->soapClient->__last_request.'***SOAP request end'
-                    : ''
-            ).(
-                property_exists($this->soapClient, '__last_response')
-                    ? "\nSOAP response start***: ".$this->soapClient->__last_response.'***SOAP response end'
-                    : ''
-            );
+                "\nSOAP method: ".$method.
+                (
+                    $this->soapClient->__getLastRequest()
+                        ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
+                        : ''
+                ).(
+                    $this->soapClient->__getLastResponse()
+                        ? "\nSOAP response start***: ".$this->soapClient->__getLastResponse().'***SOAP response end'
+                        : ''
+                );
             // "\nTrace: ".json_encode($exception->getTrace());
 
             Log::error($message);
