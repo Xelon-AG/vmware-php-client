@@ -61,11 +61,16 @@ trait SoapImportApis
     {
         $extraConfig = [];
         if (isset($configSpec->extraConfig)) {
-            foreach ($configSpec->extraConfig as $i => $config) {
-                $extraConfig[$i]['key'] = $config->key;
-                $extraConfig[$i]['value:string'] = isset($config->value->_value)
-                    ? $config->value->_value
-                    : '';
+            // sometimes there is only one level of nesting
+            if (property_exists($configSpec->extraConfig, 'key')) {
+                $extraConfig['key'] = $configSpec->extraConfig->key;
+                $extraConfig['value:string'] = $configSpec->extraConfig->value->_value ?? '';
+                // but sometimes there are several
+            } else {
+                foreach ($configSpec->extraConfig as $i => $config) {
+                    $extraConfig[$i]['key'] = $config->key;
+                    $extraConfig[$i]['value:string'] = $config->value->_value ?? '';
+                }
             }
         }
 
