@@ -19,7 +19,7 @@ trait SoapRequest
     /**
      * @return stdClass
      */
-    public function request(string $method, array $requestBody, bool $convertToSoap = true)
+    public function request(string $method, array $requestBody, bool $withXMLAttributes = false, bool $convertToSoap = true)
     {
         try {
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
@@ -40,7 +40,9 @@ trait SoapRequest
                 );
             }
 
-            return $response;
+            return ($withXMLAttributes)
+                ? $this->parseXMLResponse($this->soapClient->__getLastResponse())
+                : $response;
         } catch (\Exception $exception) {
             RequestEvent::dispatch(
                 $this->soapClient->__getLastRequest() ?? '',
@@ -66,20 +68,20 @@ trait SoapRequest
                     ]);
                     $this->soapClient->__setCookie('vmware_soap_session', $sessionInfo['vmware_soap_session']);
 
-                    return $this->request($method, $requestBody, $convertToSoap);
+                    return $this->request($method, $requestBody, $withXMLAttributes, $convertToSoap);
                 }
             }
 
             $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
                 "\nSOAP method: ".$method.
                 (
-                    $this->soapClient->__getLastRequest()
-                        ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
-                        : ''
+                $this->soapClient->__getLastRequest()
+                    ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
+                    : ''
                 ).(
-                    $this->soapClient->__getLastResponse()
-                        ? "\nSOAP response start***: ".$this->soapClient->__getLastResponse().'***SOAP response end'
-                        : ''
+                $this->soapClient->__getLastResponse()
+                    ? "\nSOAP response start***: ".$this->soapClient->__getLastResponse().'***SOAP response end'
+                    : ''
                 );
             // "\nTrace: ".json_encode($exception->getTrace());
 
