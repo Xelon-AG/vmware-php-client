@@ -166,7 +166,7 @@ trait SoapImportApis
                     'virtualICH7MPresent' => $configSpec->virtualICH7MPresent ?? null,
                     'virtualSMCPresent' => $configSpec->virtualSMCPresent ?? null,
                     'deviceChange' => $deviceChange,
-                    'memoryAllocation' => [
+                    'memoryAllocation' => isset($configSpec->memoryAllocation) ? [
                         'reservation' =>  $configSpec->memoryAllocation->reservation ?? null,
                         'expandableReservation' => $configSpec->memoryAllocation->expandableReservation ?? null,
                         'limit' => $configSpec->memoryAllocation->limit ?? null,
@@ -174,7 +174,7 @@ trait SoapImportApis
                             'shares' => $configSpec->memoryAllocation->shares->shares ?? null,
                             'level' => $configSpec->memoryAllocation->shares->level ?? null,
                         ] : null,
-                    ],
+                    ] : null,
                     'extraConfig' => \count($extraConfig) > 0 ? $extraConfig : null,
                     'bootOptions' => $configSpec->bootOptions ? [
                         'bootDelay' => $configSpec->bootOptions->bootDelay ?? null,
