@@ -21,4 +21,6 @@ class VirtualDisk extends VirtualDevice
     public $vDiskId;
 
     public $nativeUnmanagedLinkedClone;
+
+    public $independentFilters;
 }

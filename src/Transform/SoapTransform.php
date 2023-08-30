@@ -22,6 +22,11 @@ trait SoapTransform
         $typeName = null;
         $data = [];
         foreach ($array as $key => $value) {
+            if (str_contains($key, ':')) {
+                $keyString = explode(':', $key);
+                $key = $keyString[0];
+                $type = $keyString[1];
+            }
             if (is_array($value) || $value instanceof DynamicData) {
                 if ($value instanceof DynamicData) {
                     $typeName = (new \ReflectionClass($value))->getShortName();
@@ -75,7 +80,9 @@ trait SoapTransform
 
                 $typeName = null;
             } elseif (! is_null($value)) {
-                $data[$key] = new SoapVar($value, null, null, null, $key);
+                $encoding = isset($type) ? XSD_STRING : null;
+                $typeName = isset($type) ? 'xsd:string' : null;
+                $data[$key] = new SoapVar($value, $encoding, $typeName, null, $key);
             }
         }
 
