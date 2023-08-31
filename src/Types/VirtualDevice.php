@@ -19,4 +19,8 @@ class VirtualDevice extends DynamicData
     public $controllerKey;
 
     public $unitNumber;
+
+    public $numaNode;
+
+    public $deviceGroupInfo;
 }

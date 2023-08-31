@@ -19,14 +19,14 @@ trait SoapRequest
     /**
      * @return stdClass
      */
-    public function request(string $method, array $requestBody, bool $convertToSoap = true)
+    public function request(string $method, array $requestBody, bool $withXMLAttributes = false, bool $convertToSoap = true)
     {
         try {
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
 
             RequestEvent::dispatch(
-                property_exists($this->soapClient, '__last_request') ? $this->soapClient->__last_request : '',
-                property_exists($this->soapClient, '__last_response') ? $this->soapClient->__last_response : '',
+                $this->soapClient->__getLastRequest() ?? '',
+                $this->soapClient->__getLastResponse() ?? '',
                 true
             );
 
@@ -34,17 +34,19 @@ trait SoapRequest
                 Log::info(
                     'SOAP REQUEST SUCCESS:'.
                     "\nSOAP method: ".$method.
-                    property_exists($this->soapClient, '__last_request')
-                        ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__last_request).'***SOAP request end'
+                    $this->soapClient->__getLastRequest()
+                        ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__getLastRequest()).'***SOAP request end'
                         : ''
                 );
             }
 
-            return $response;
+            return ($withXMLAttributes)
+                ? $this->parseXMLResponse($this->soapClient->__getLastResponse())
+                : $response;
         } catch (\Exception $exception) {
             RequestEvent::dispatch(
-                property_exists($this->soapClient, '__last_request') ? $this->soapClient->__last_request : '',
-                property_exists($this->soapClient, '__last_response') ? $this->soapClient->__last_response : '',
+                $this->soapClient->__getLastRequest() ?? '',
+                $this->soapClient->__getLastResponse() ?? '',
                 false
             );
 
@@ -66,21 +68,21 @@ trait SoapRequest
                     ]);
                     $this->soapClient->__setCookie('vmware_soap_session', $sessionInfo['vmware_soap_session']);
 
-                    return $this->request($method, $requestBody, $convertToSoap);
+                    return $this->request($method, $requestBody, $withXMLAttributes, $convertToSoap);
                 }
             }
 
             $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
             "\nSOAP method: ".$method.
             (
-                property_exists($this->soapClient, '__last_request')
-                    ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__last_request).'***SOAP request end'
+                $this->soapClient->__getLastRequest()
+                    ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__getLastRequest()).'***SOAP request end'
                     : ''
-            ).(
-                property_exists($this->soapClient, '__last_response')
-                    ? "\nSOAP response start***: ".$this->soapClient->__last_response.'***SOAP response end'
+                ).(
+                $this->soapClient->__getLastResponse()
+                    ? "\nSOAP response start***: ".$this->soapClient->__getLastResponse().'***SOAP response end'
                     : ''
-            );
+                );
             // "\nTrace: ".json_encode($exception->getTrace());
 
             Log::error($message);
@@ -102,5 +104,62 @@ trait SoapRequest
         $soapMessage = array_merge($soapMessage, $requestBody);
 
         return $this->request($method, $soapMessage);
+    }
+
+    /*
+     * Totally not stolen from https://stackoverflow.com/a/46349713
+     */
+    private function parseXMLResponse(string $xmlResponse)
+    {
+        $previous_value = libxml_use_internal_errors(true);
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->preserveWhiteSpace = false;
+        $dom->loadXml($xmlResponse);
+        libxml_use_internal_errors($previous_value);
+
+        if (libxml_get_errors()) {
+            return [];
+        }
+
+        return $this->domToArray($dom);
+    }
+
+    private function domToArray($root) {
+        $result = [];
+
+        if ($root->hasAttributes()) {
+            $attrs = $root->attributes;
+            foreach ($attrs as $attr) {
+                $result['@attributes'][$attr->name] = $attr->value;
+            }
+        }
+
+        if ($root->hasChildNodes()) {
+            $children = $root->childNodes;
+            if ($children->length == 1) {
+                $child = $children->item(0);
+                if (in_array($child->nodeType,[XML_TEXT_NODE,XML_CDATA_SECTION_NODE])) {
+                    $result['_value'] = $child->nodeValue;
+                    return count($result) == 1
+                        ? $result['_value']
+                        : $result;
+                }
+
+            }
+            $groups = [];
+            foreach ($children as $child) {
+                if (!isset($result[$child->nodeName])) {
+                    $result[$child->nodeName] = $this->domToArray($child);
+                } else {
+                    if (!isset($groups[$child->nodeName])) {
+                        $result[$child->nodeName] = [$result[$child->nodeName]];
+                        $groups[$child->nodeName] = 1;
+                    }
+                    $result[$child->nodeName][] = $this->domToArray($child);
+                }
+            }
+        }
+
+        return $result;
     }
 }
