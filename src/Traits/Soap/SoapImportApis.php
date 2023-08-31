@@ -206,7 +206,7 @@ trait SoapImportApis
                     ],
                     'firmware' => $configSpec->firmware ?? null,
                     'nestedHVEnabled' => $configSpec->nestedHVEnabled ?? null,
-                    'sgxInfo' => $configSpec->sgxInfo ? [
+                    'sgxInfo' => isset($configSpec->sgxInfo) ? [
                         'epcSize' => $configSpec->sgxInfo->epcSize ?? null,
                         'flcMode' => $configSpec->sgxInfo->flcMode ?? null,
                         'lePubKeyHash' => $configSpec->sgxInfo->lePubKeyHash ?? null,
