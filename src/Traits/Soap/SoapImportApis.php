@@ -62,7 +62,7 @@ trait SoapImportApis
         $extraConfig = [];
         if (isset($configSpec->extraConfig)) {
             // sometimes there is only one level of nesting
-            if (!array($configSpec->extraConfig) && property_exists($configSpec->extraConfig, 'key')) {
+            if (!is_array($configSpec->extraConfig) && property_exists($configSpec->extraConfig, 'key')) {
                 $extraConfig['key'] = $configSpec->extraConfig->key;
                 $extraConfig['value:string'] = $configSpec->extraConfig->value->_value ?? '';
                 // but sometimes there are several
