@@ -186,7 +186,7 @@ trait SoapImportApis
                         'networkBootProtocol' => $configSpec->bootOptions->networkBootProtocol ?? null,
                     ] : null,
                     'vAppConfig' => [
-                        'product' => $configSpec->vAppConfig->product ? [
+                        'product' => isset($configSpec->vAppConfig->product) ? [
                             'operation' => $configSpec->vAppConfig->product->operation ?? null,
                             'info' => $configSpec->vAppConfig->product->info ? [
                                 'key' => $configSpec->vAppConfig->product->info->key ?? null,
