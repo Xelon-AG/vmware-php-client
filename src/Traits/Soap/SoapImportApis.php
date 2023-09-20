@@ -62,7 +62,7 @@ trait SoapImportApis
         $extraConfig = [];
         if (isset($configSpec->extraConfig)) {
             // sometimes there is only one level of nesting
-            if (property_exists($configSpec->extraConfig, 'key')) {
+            if (!is_array($configSpec->extraConfig) && property_exists($configSpec->extraConfig, 'key')) {
                 $extraConfig['key'] = $configSpec->extraConfig->key;
                 $extraConfig['value:string'] = $configSpec->extraConfig->value->_value ?? '';
                 // but sometimes there are several
@@ -186,7 +186,7 @@ trait SoapImportApis
                         'networkBootProtocol' => $configSpec->bootOptions->networkBootProtocol ?? null,
                     ] : null,
                     'vAppConfig' => [
-                        'product' => $configSpec->vAppConfig->product ? [
+                        'product' => isset($configSpec->vAppConfig->product) ? [
                             'operation' => $configSpec->vAppConfig->product->operation ?? null,
                             'info' => $configSpec->vAppConfig->product->info ? [
                                 'key' => $configSpec->vAppConfig->product->info->key ?? null,
