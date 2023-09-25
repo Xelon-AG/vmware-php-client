@@ -115,14 +115,14 @@ trait SoapImportApis
                     'version' => $configSpec->version ?? null,
                     'uuid' => $configSpec->uuid ?? null,
                     'guestId' => $configSpec->guestId ?? null,
-                    'files' => $configSpec->files ? new VirtualMachineFileInfo([
+                    'files' => isset($configSpec->files) ? new VirtualMachineFileInfo([
                         'vmPathName' => $configSpec->files->vmPathName ?? null,
                         'snapshotDirectory' => $configSpec->files->snapshotDirectory ?? null,
                         'suspendDirectory' => $configSpec->files->suspendDirectory ?? null,
                         'logDirectory' => $configSpec->files->logDirectory ?? null,
                         'ftMetadataDirectory' => $configSpec->files->ftMetadataDirectory ?? null,
                     ]) : null,
-                    'tools' => $configSpec->tools ? new ToolsConfigInfo([
+                    'tools' => isset($configSpec->tools) ? new ToolsConfigInfo([
                         'toolsVersion' => $configSpec->tools->toolsVersion ?? null,
                         'toolsInstallType' => $configSpec->tools->toolsInstallType ?? null,
                         'afterPowerOn' => $configSpec->tools->afterPowerOn ?? null,
@@ -138,7 +138,7 @@ trait SoapImportApis
                         'lastInstallInfo' => $configSpec->tools->lastInstallInfo ?? null,
 
                     ]) : null,
-                    'flags' => $configSpec->flags ? new VirtualMachineFlagInfo([
+                    'flags' => isset($configSpec->flags) ? new VirtualMachineFlagInfo([
                         'disableAcceleration' => $configSpec->flags->disableAcceleration ?? null,
                         'enableLogging' => $configSpec->flags->enableLogging ?? null,
                         'useToe' => $configSpec->flags->useToe ?? null,
@@ -157,7 +157,7 @@ trait SoapImportApis
                         'vvtdEnabled' => $configSpec->flags->vvtdEnabled ?? null,
                         'vbsEnabled' => $configSpec->flags->vbsEnabled ?? null,
                     ]) : null,
-                    'numCPUs' => $configSpec->numCPUs ?? null,
+                    'numCPUs' => isset($configSpec->numCPUs) ?? null,
                     'numCoresPerSocket' => $configSpec->numCoresPerSocket ?? null,
                     'memoryMB' => $configSpec->memoryMB ?? null,
                     'memoryHotAddEnabled' => $configSpec->memoryHotAddEnabled ?? null,
@@ -176,7 +176,7 @@ trait SoapImportApis
                         ] : null,
                     ] : null,
                     'extraConfig' => \count($extraConfig) > 0 ? $extraConfig : null,
-                    'bootOptions' => $configSpec->bootOptions ? [
+                    'bootOptions' => isset($configSpec->bootOptions) ? [
                         'bootDelay' => $configSpec->bootOptions->bootDelay ?? null,
                         'enterBIOSSetup' => $configSpec->bootOptions->enterBIOSSetup ?? null,
                         'efiSecureBootEnabled' => $configSpec->bootOptions->efiSecureBootEnabled,
