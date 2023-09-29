@@ -62,7 +62,7 @@ trait SoapImportApis
         $extraConfig = [];
         if (isset($configSpec->extraConfig)) {
             // sometimes there is only one level of nesting
-            if (property_exists($configSpec->extraConfig, 'key')) {
+            if (!is_array($configSpec->extraConfig) && property_exists($configSpec->extraConfig, 'key')) {
                 $extraConfig['key'] = $configSpec->extraConfig->key;
                 $extraConfig['value:string'] = $configSpec->extraConfig->value->_value ?? '';
                 // but sometimes there are several
@@ -115,14 +115,14 @@ trait SoapImportApis
                     'version' => $configSpec->version ?? null,
                     'uuid' => $configSpec->uuid ?? null,
                     'guestId' => $configSpec->guestId ?? null,
-                    'files' => $configSpec->files ? new VirtualMachineFileInfo([
+                    'files' => isset($configSpec->files) ? new VirtualMachineFileInfo([
                         'vmPathName' => $configSpec->files->vmPathName ?? null,
                         'snapshotDirectory' => $configSpec->files->snapshotDirectory ?? null,
                         'suspendDirectory' => $configSpec->files->suspendDirectory ?? null,
                         'logDirectory' => $configSpec->files->logDirectory ?? null,
                         'ftMetadataDirectory' => $configSpec->files->ftMetadataDirectory ?? null,
                     ]) : null,
-                    'tools' => $configSpec->tools ? new ToolsConfigInfo([
+                    'tools' => isset($configSpec->tools) ? new ToolsConfigInfo([
                         'toolsVersion' => $configSpec->tools->toolsVersion ?? null,
                         'toolsInstallType' => $configSpec->tools->toolsInstallType ?? null,
                         'afterPowerOn' => $configSpec->tools->afterPowerOn ?? null,
@@ -138,7 +138,7 @@ trait SoapImportApis
                         'lastInstallInfo' => $configSpec->tools->lastInstallInfo ?? null,
 
                     ]) : null,
-                    'flags' => $configSpec->flags ? new VirtualMachineFlagInfo([
+                    'flags' => isset($configSpec->flags) ? new VirtualMachineFlagInfo([
                         'disableAcceleration' => $configSpec->flags->disableAcceleration ?? null,
                         'enableLogging' => $configSpec->flags->enableLogging ?? null,
                         'useToe' => $configSpec->flags->useToe ?? null,
@@ -176,7 +176,7 @@ trait SoapImportApis
                         ] : null,
                     ] : null,
                     'extraConfig' => \count($extraConfig) > 0 ? $extraConfig : null,
-                    'bootOptions' => $configSpec->bootOptions ? [
+                    'bootOptions' => isset($configSpec->bootOptions) ? [
                         'bootDelay' => $configSpec->bootOptions->bootDelay ?? null,
                         'enterBIOSSetup' => $configSpec->bootOptions->enterBIOSSetup ?? null,
                         'efiSecureBootEnabled' => $configSpec->bootOptions->efiSecureBootEnabled,
@@ -186,7 +186,7 @@ trait SoapImportApis
                         'networkBootProtocol' => $configSpec->bootOptions->networkBootProtocol ?? null,
                     ] : null,
                     'vAppConfig' => [
-                        'product' => $configSpec->vAppConfig->product ? [
+                        'product' => isset($configSpec->vAppConfig->product) ? [
                             'operation' => $configSpec->vAppConfig->product->operation ?? null,
                             'info' => $configSpec->vAppConfig->product->info ? [
                                 'key' => $configSpec->vAppConfig->product->info->key ?? null,
@@ -206,7 +206,7 @@ trait SoapImportApis
                     ],
                     'firmware' => $configSpec->firmware ?? null,
                     'nestedHVEnabled' => $configSpec->nestedHVEnabled ?? null,
-                    'sgxInfo' => $configSpec->sgxInfo ? [
+                    'sgxInfo' => isset($configSpec->sgxInfo) ? [
                         'epcSize' => $configSpec->sgxInfo->epcSize ?? null,
                         'flcMode' => $configSpec->sgxInfo->flcMode ?? null,
                         'lePubKeyHash' => $configSpec->sgxInfo->lePubKeyHash ?? null,

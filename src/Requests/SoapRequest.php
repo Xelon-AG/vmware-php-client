@@ -35,7 +35,7 @@ trait SoapRequest
                     'SOAP REQUEST SUCCESS:'.
                     "\nSOAP method: ".$method.
                     $this->soapClient->__getLastRequest()
-                        ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
+                        ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__getLastRequest()).'***SOAP request end'
                         : ''
                 );
             }
@@ -73,10 +73,10 @@ trait SoapRequest
             }
 
             $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
-                "\nSOAP method: ".$method.
-                (
+            "\nSOAP method: ".$method.
+            (
                 $this->soapClient->__getLastRequest()
-                    ? "\nSOAP request start***".$this->soapClient->__getLastRequest().'***SOAP request end'
+                    ? "\nSOAP request start***".preg_replace('#<password>.+</password>#', '<password>*****</password>', $this->soapClient->__getLastRequest()).'***SOAP request end'
                     : ''
                 ).(
                 $this->soapClient->__getLastResponse()
