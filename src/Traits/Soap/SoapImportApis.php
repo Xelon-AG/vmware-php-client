@@ -157,7 +157,7 @@ trait SoapImportApis
                         'vvtdEnabled' => $configSpec->flags->vvtdEnabled ?? null,
                         'vbsEnabled' => $configSpec->flags->vbsEnabled ?? null,
                     ]) : null,
-                    'numCPUs' => isset($configSpec->numCPUs) ?? null,
+                    'numCPUs' => $configSpec->numCPUs ?? null,
                     'numCoresPerSocket' => $configSpec->numCoresPerSocket ?? null,
                     'memoryMB' => $configSpec->memoryMB ?? null,
                     'memoryHotAddEnabled' => $configSpec->memoryHotAddEnabled ?? null,
