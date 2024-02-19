@@ -20,6 +20,7 @@ use Xelon\VmWareClient\Types\VirtualCdromRemoteAtapiBackingInfo;
 use Xelon\VmWareClient\Types\VirtualDeviceConnectInfo;
 use Xelon\VmWareClient\Types\VirtualDisk;
 use Xelon\VmWareClient\Types\VirtualDiskFlatVer2BackingInfo;
+use Xelon\VmWareClient\Types\VirtualE1000e;
 use Xelon\VmWareClient\Types\VirtualEthernetCardDistributedVirtualPortBackingInfo;
 use Xelon\VmWareClient\Types\VirtualLsiLogicSASController;
 use Xelon\VmWareClient\Types\VirtualVmxnet3;
@@ -137,6 +138,27 @@ class SoapData
         ]);
     }
 
+    public function addNetworkOPNsenseSpec(
+        string $switchUuid,
+        string $portgroupKey,
+        int $unitNumber,
+        int $controllerKey = 100,
+        int $key = -1
+    ): VirtualE1000e {
+        return new VirtualE1000e([
+            'key' => $key,
+            'backing' => new VirtualEthernetCardDistributedVirtualPortBackingInfo([
+                'port' => new DistributedVirtualSwitchPortConnection([
+                    'switchUuid' => $switchUuid,
+                    'portgroupKey' => $portgroupKey,
+                ]),
+            ]),
+            'controllerKey' => $controllerKey,
+            'unitNumber' => $unitNumber,
+            'uptCompatibilityEnabled' => false
+        ]);
+    }
+
     public function editNetworkSpec(
         string $switchUuid,
         string $portgroupKey,
@@ -162,6 +184,35 @@ class SoapData
                 : null,
             'addressType' => $addressType,
             'macAddress' => $macAddress,
+        ]);
+    }
+
+    public function editNetworkOPNsenseSpec(
+        string $switchUuid,
+        string $portgroupKey,
+        int $key,
+        ?string $macAddress = null,
+        string $addressType = 'generated',
+        bool $forceConnected = false
+    ): VirtualE1000e {
+        return new VirtualE1000e([
+            'key' => $key,
+            'backing' => new VirtualEthernetCardDistributedVirtualPortBackingInfo([
+                'port' => new DistributedVirtualSwitchPortConnection([
+                    'switchUuid' => $switchUuid,
+                    'portgroupKey' => $portgroupKey,
+                ]),
+            ]),
+            'connectable' => $forceConnected
+                ? new VirtualDeviceConnectInfo([
+                    'startConnected' => true,
+                    'allowGuestControl' => true,
+                    'connected' => true,
+                ])
+                : null,
+            'addressType' => $addressType,
+            'macAddress' => $macAddress,
+            'uptCompatibilityEnabled' => false
         ]);
     }
 
