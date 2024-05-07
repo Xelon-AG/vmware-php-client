@@ -51,8 +51,6 @@ trait VmApis
 
     public function stopPower(string $vmId)
     {
-        $a = 5;
-
         return $this->request(
             'post',
             $this->version >= 7 ? "/api/vcenter/vm/$vmId/power?action=stop" : "/rest/vcenter/vm/$vmId/power/stop"
@@ -132,14 +130,17 @@ trait VmApis
         // TODO:
     }
 
-    public function getGuestPower()
+    public function getGuestPower(string $vmId)
     {
-        // TODO:
+        return $this->request('get', "$this->apiUrlPrefix/vcenter/vm/$vmId/guest/power");
     }
 
-    public function rebootGuestPower()
+    public function rebootGuestPower(string $vmId)
     {
-        // TODO:
+        return $this->request(
+            'post',
+            "/api/vcenter/vm/$vmId/guest/power?action=reboot"
+        );
     }
 
     public function shutdownGuestPower(string $vmId)
@@ -284,11 +285,12 @@ trait VmApis
 
     public function updateHardwareCpu(
         string $vmId,
-        int $coresPerSocket,
-        int $count,
-        bool $hotAddEnabled = false,
-        bool $hotRemoveEnabled = false
-    ) {
+        int    $coresPerSocket,
+        int    $count,
+        bool   $hotAddEnabled = false,
+        bool   $hotRemoveEnabled = false
+    )
+    {
         $requestBody = [
             'cores_per_socket' => $coresPerSocket,
             'count' => $count,
