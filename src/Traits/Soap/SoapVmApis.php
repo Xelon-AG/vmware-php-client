@@ -294,7 +294,9 @@ trait SoapVmApis
         string $macAddress,
         int $key,
         string $addressType = 'generated',
-        bool $forceConnected = false
+        bool $forceConnected = false,
+        bool $startConnected = true,
+        bool $connected = true,
     ) {
         $body = [
             'spec' => new VirtualMachineConfigSpec([
@@ -306,7 +308,9 @@ trait SoapVmApis
                         $key,
                         $macAddress,
                         $addressType,
-                        $forceConnected
+                        $forceConnected,
+                        $startConnected,
+                        $connected,
                     ),
                 ]),
             ]),
