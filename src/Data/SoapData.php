@@ -123,7 +123,10 @@ class SoapData
         string $portgroupKey,
         int $unitNumber,
         int $controllerKey = 100,
-        int $key = -1
+        int $key = -1,
+        bool $forceConnected = false,
+        bool $startConnected = true,
+        bool $connected = true
     ): VirtualVmxnet3 {
         return new VirtualVmxnet3([
             'key' => $key,
@@ -133,6 +136,13 @@ class SoapData
                     'portgroupKey' => $portgroupKey,
                 ]),
             ]),
+            'connectable' => $forceConnected
+                ? new VirtualDeviceConnectInfo([
+                    'startConnected' => $startConnected,
+                    'allowGuestControl' => true,
+                    'connected' => $connected,
+                ])
+                : null,
             'controllerKey' => $controllerKey,
             'unitNumber' => $unitNumber,
         ]);
