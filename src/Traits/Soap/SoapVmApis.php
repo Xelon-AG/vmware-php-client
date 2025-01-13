@@ -5,6 +5,7 @@ namespace Xelon\VmWareClient\Traits\Soap;
 use Illuminate\Support\Facades\Log;
 use Xelon\VmWareClient\Requests\SoapRequest;
 use Xelon\VmWareClient\Transform\SoapTransform;
+use Xelon\VmWareClient\Types\ClusterAffinityRuleSpec;
 use Xelon\VmWareClient\Types\ClusterAntiAffinityRuleSpec;
 use Xelon\VmWareClient\Types\ClusterConfigSpecEx;
 use Xelon\VmWareClient\Types\ClusterRuleSpec;
@@ -394,7 +395,8 @@ trait SoapVmApis
     public function reconfigureComputeResource(
         string $clusterComputerResourceId,
         string $name,
-        array $vmIds
+        array $vmIds,
+        bool $isAntiAffinity = false
     ) {
         $vm = [];
 
@@ -411,17 +413,20 @@ trait SoapVmApis
                 'type' => 'ComputeResource',
             ],
             'spec' => new ClusterConfigSpecEx([
-                // 'drsConfig' => new ClusterDrsConfigInfo(),
                 'rulesSpec' => new ClusterRuleSpec([
                     'operation' => 'add',
-                    'info' => new ClusterAntiAffinityRuleSpec([
+                    'info' => $isAntiAffinity ? new ClusterAntiAffinityRuleSpec([
+                        'enabled' => true,
+                        'name' => $name,
+                        'userCreated' => true,
+                        'vm' => $vm,
+                    ]) : new ClusterAffinityRuleSpec([
                         'enabled' => true,
                         'name' => $name,
                         'userCreated' => true,
                         'vm' => $vm,
                     ]),
                 ]),
-                // 'dpmConfig' => new ClusterDpmConfigInfo(),
             ]),
             'modify' => false,
         ];
