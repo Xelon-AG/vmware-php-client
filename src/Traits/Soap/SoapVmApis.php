@@ -428,7 +428,7 @@ trait SoapVmApis
                     ]),
                 ]),
             ]),
-            'modify' => false,
+            'modify' => true,
         ];
 
         return $this->request('ReconfigureComputeResource_Task', $body);
