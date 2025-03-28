@@ -622,4 +622,25 @@ trait SoapVmApis
 
         return $this->request('ConsolidateVMDisks_Task', $body);
     }
+
+    public function fetchSystemEventLog(string $vmId)
+    {
+        $body = [
+            '_this' => [
+                '_' => 'EventManager',
+                'type' => 'EventManager',
+            ],
+            'filter' => [
+                'entity' => [
+                    'entity' => [
+                        'type' => 'VirtualMachine',
+                        '_' => $vmId,
+                    ],
+                    'recursion' => 'self',
+                ],
+            ],
+        ];
+
+        return $this->request('QueryEvents', $body);
+    }
 }
