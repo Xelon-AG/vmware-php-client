@@ -93,6 +93,9 @@ class SoapData
                 'thinProvisioned' => $params['backing']['thinProvisioned'] ?? false,
                 'eagerlyScrub' => $params['backing']['eagerlyScrub'] ?? false,
             ]),
+            'storageIOAllocation' => isset($params['storageIOAllocation'])
+                ? ['limit' => $params['storageIOAllocation']['limit']]
+                : false,
             'controllerKey' => $params['controllerKey'],
             'unitNumber' => $params['unitNumber'],
             'capacityInKB' => $params['capacityInKB'],
