@@ -128,6 +128,48 @@ trait SoapVmApis
         return $this->transformPropSetArray($result->returnval ?? []);
     }
 
+    public function getNetworksBySwitchIds(array $switchIds, $pathSet = null)
+    {
+        $networks = [];
+
+        foreach ($switchIds as $switchId) {
+            $body = [
+                '_this' => [
+                    '_' => 'propertyCollector',
+                    'type' => 'PropertyCollector',
+                ],
+                'specSet' => [
+                    'propSet' => [
+                        'type' => 'DistributedVirtualPortgroup',
+                        'all' => ! $pathSet,
+                        'pathSet' => $pathSet,
+                    ],
+                    'objectSet' => [
+                        'obj' => [
+                            '_' => $switchId,
+                            'type' => 'DistributedVirtualSwitch',
+                        ],
+                        'skip' => false,
+                        'selectSet' => [
+                            new \SoapVar([
+                                'name' => 'DVSToPortgroup',
+                                'type' => 'DistributedVirtualSwitch',
+                                'path' => 'portgroup',
+                                'skip' => false
+                            ], SOAP_ENC_OBJECT, 'TraversalSpec'),
+                        ],
+                    ],
+                ],
+            ];
+
+            $result = $this->soapClient->RetrieveProperties($body);
+
+            $networks = [...$networks, ...$this->transformPropSetArray($result->returnval ?? [])];
+        }
+
+        return $networks;
+    }
+
     public function getResourcePoolInfo(?string $resourcePoolId, string $pathSet = '')
     {
         if (! $resourcePoolId) {
