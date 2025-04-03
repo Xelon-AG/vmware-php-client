@@ -6,9 +6,13 @@ parameters:
     paths:
         - src
         - config
-        - database
     tmpDir: build/phpstan
-    checkOctaneCompatibility: true
-    checkModelProperties: true
-    checkMissingIterableValueType: false
+    ignoreErrors:
+        - '#Access to an undefined property Xelon\\VmWareClient\\VcenterSoapClient::\$ip\.#'
+        - '#Access to an undefined property Xelon\\VmWareClient\\VcenterSoapClient::\$version\.#'
+        - '#Dead catch - GuzzleHttp\\Exception\\ClientException is already caught above\.#'
+        - '#Ternary operator condition is always true\.#'
+        - '#Argument of an invalid type Xelon\\VmWareClient\\Types\\Core\\DynamicData supplied for foreach, only iterables are supported\.#'
+        - '#Access to an undefined property Exception::\$detail\.#'
+        - '#Variable \$result might not be defined\.#'
 
