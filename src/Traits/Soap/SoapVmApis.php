@@ -581,6 +581,23 @@ trait SoapVmApis
         return $this->vmRequest('CreateSnapshot_Task', $vmId, $body);
     }
 
+    public function renameSnapshot(
+        string $snapshopId,
+        string $name,
+        ?string $description,
+    ) {
+        $body = [
+            '_this' => [
+                '_' => $snapshopId,
+                'type' => 'VirtualMachineSnapshot',
+            ],
+            'name' => $name,
+            'description' => $description,
+        ];
+
+        return $this->request('RenameSnapshot', $body);
+    }
+
     public function revertSnapshot(string $snapshopId)
     {
         $body = [
