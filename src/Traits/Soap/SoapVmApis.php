@@ -16,6 +16,7 @@ use Xelon\VmWareClient\Types\VirtualDeviceConfigSpec;
 use Xelon\VmWareClient\Types\VirtualDisk;
 use Xelon\VmWareClient\Types\VirtualMachineBootOptionsBootableCdromDevice;
 use Xelon\VmWareClient\Types\VirtualMachineConfigSpec;
+use SoapVar;
 
 trait SoapVmApis
 {
@@ -91,11 +92,11 @@ trait SoapVmApis
 
     public function getAllVms(string $vmFolder, $pathSet = null)
     {
-        $ss1 = new \SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
-        $ss2 = new \SoapVar(['name' => 'DataCenterVMTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $ss1 = new SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $ss2 = new SoapVar(['name' => 'DataCenterVMTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
         $a = ['name' => 'FolderTraversalSpec', 'type' => 'Folder', 'path' => 'childEntity', 'skip' => false, $ss1, $ss2];
 
-        $ss = new \SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
+        $ss = new SoapVar(['name' => 'FolderTraversalSpec'], SOAP_ENC_OBJECT, null, null, 'selectSet', null);
         $b = ['name' => 'DataCenterVMTraversalSpec', 'type' => 'Datacenter', 'path' => 'vmFolder', 'skip' => false, $ss];
 
         $body = [
@@ -116,8 +117,8 @@ trait SoapVmApis
                     ],
                     'skip' => false,
                     'selectSet' => [
-                        new \SoapVar($a, SOAP_ENC_OBJECT, 'TraversalSpec'),
-                        new \SoapVar($b, SOAP_ENC_OBJECT, 'TraversalSpec'),
+                        new SoapVar($a, SOAP_ENC_OBJECT, 'TraversalSpec'),
+                        new SoapVar($b, SOAP_ENC_OBJECT, 'TraversalSpec'),
                     ],
                 ],
             ],
@@ -151,7 +152,7 @@ trait SoapVmApis
                         ],
                         'skip' => false,
                         'selectSet' => [
-                            new \SoapVar([
+                            new SoapVar([
                                 'name' => 'DVSToPortgroup',
                                 'type' => 'DistributedVirtualSwitch',
                                 'path' => 'portgroup',
@@ -435,10 +436,12 @@ trait SoapVmApis
     }
 
     public function reconfigureComputeResource(
+        string $operationType, // add, edit, remove
         string $clusterComputerResourceId,
         string $name,
         array $vmIds,
-        bool $isAntiAffinity = false
+        bool $isAntiAffinity = false,
+        int $key = null // unique rule key (remote_rule_id)
     ) {
         $vm = [];
 
@@ -456,13 +459,15 @@ trait SoapVmApis
             ],
             'spec' => new ClusterConfigSpecEx([
                 'rulesSpec' => new ClusterRuleSpec([
-                    'operation' => 'add',
+                    'operation' => $operationType,
                     'info' => $isAntiAffinity ? new ClusterAntiAffinityRuleSpec([
+                        'key' => $key,
                         'enabled' => true,
                         'name' => $name,
                         'userCreated' => true,
                         'vm' => $vm,
                     ]) : new ClusterAffinityRuleSpec([
+                        'key' => $key,
                         'enabled' => true,
                         'name' => $name,
                         'userCreated' => true,
@@ -472,6 +477,10 @@ trait SoapVmApis
             ]),
             'modify' => true,
         ];
+
+        if ($operationType === 'remove') {
+            $body['spec']->rulesSpec->removeKey = new SoapVar($key, XSD_INT, 'xsd:int');
+        }
 
         return $this->request('ReconfigureComputeResource_Task', $body);
     }
