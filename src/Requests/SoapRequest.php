@@ -2,6 +2,7 @@
 
 namespace Xelon\VmWareClient\Requests;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use stdClass;
@@ -18,8 +19,9 @@ trait SoapRequest
 
     /**
      * @return stdClass
+     * @throws \Exception
      */
-    public function request(string $method, array $requestBody, bool $withXMLAttributes = false, bool $convertToSoap = true)
+    public function request(string $method, array $requestBody, bool $withXMLAttributes = false, bool $convertToSoap = true): stdClass
     {
         try {
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
@@ -66,10 +68,68 @@ trait SoapRequest
                             ],
                         ]),
                     ]);
+
                     $this->soapClient->__setCookie('vmware_soap_session', $sessionInfo['vmware_soap_session']);
 
-                    return $this->request($method, $requestBody, $withXMLAttributes, $convertToSoap);
+                    try {
+                        Cache::forget("vcenter-soap-session-$this->ip");
+
+                        $sessionManager = new \stdClass();
+                        $sessionManager->_ = $sessionManager->type = 'SessionManager';
+
+                        $soaplogout['_this'] = $sessionManager;
+                        $this->soapClient->Logout($soaplogout);
+                    } catch (\Exception $exception) {
+                        Log::error('Can\'t delete soap session: ' . $exception->getMessage());
+                    }
                 }
+
+                try {
+                    $this->soapClient = new \SoapClient("$this->ip/sdk/vimService.wsdl", [
+                        'location' => "$this->ip/sdk/",
+                        'trace' => 1,
+                        'stream_context' => stream_context_create([
+                            'ssl' => [
+                                'verify_peer' => false,
+                                'verify_peer_name' => false,
+                                'allow_self_signed' => true,
+                            ],
+                        ]),
+                    ]);
+
+                    $serviceInstanseMessage['_this'] = new \Soapvar('ServiceInstance', XSD_STRING, 'ServiceInstance');
+                    $result = $this->soapClient->RetrieveServiceContent($serviceInstanseMessage);
+                    $serviceContent = $result->returnval;
+
+                    $loginMessage = [
+                        '_this' => $serviceContent->sessionManager,
+                        'userName' => $this->login,
+                        'password' => $this->password,
+                    ];
+                    $this->soapClient->Login($loginMessage);
+
+                    if (array_key_exists('vmware_soap_session', $this->soapClient->__getCookies())) {
+                        $soapSessionToken = $this->soapClient->__getCookies()['vmware_soap_session'][0];
+                    } else {
+                        $responseHeaders = $this->soapClient->__getLastResponseHeaders();
+
+                        $string = strstr($responseHeaders, 'vmware_soap_session');
+                        $string = strstr($string, '"');
+                        $string = ltrim($string, '"');
+                        $soapSessionToken = substr($string, 0, strpos($string, '"'));
+                        $this->soapClient->__setCookie('vmware_soap_session', $soapSessionToken);
+                    }
+
+                    Cache::put("vcenter-soap-session-$this->ip", [
+                        'vmware_soap_session' => $soapSessionToken,
+                        'expired_at' => Carbon::now()->addSeconds(config('vmware-php-client.session_ttl') * 60 - 30),
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Soap api exception : '.$e->getMessage());
+                    throw new \Exception($e->getMessage());
+                }
+
+                return $this->request($method, $requestBody, $withXMLAttributes, $convertToSoap);
             }
 
             $message = "SOAP REQUEST FAILED:\nMessage: ".$exception->getMessage().
