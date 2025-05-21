@@ -22,10 +22,18 @@ class VcenterSoapClient
 
     public SoapData $data;
 
-    public function __construct(SoapClient $soapClient, string $ip)
+    public string $ip;
+
+    public string $login;
+
+    public string $password;
+
+    public function __construct(SoapClient $soapClient, string $ip, string $login, string $password)
     {
         $this->soapClient = $soapClient;
         $this->ip = $ip;
+        $this->login = $login;
+        $this->password = $password;
         $this->data = new SoapData();
     }
 }
