@@ -18,10 +18,9 @@ trait SoapRequest
     use SoapTransform;
 
     /**
-     * @return stdClass
      * @throws \Exception
      */
-    public function request(string $method, array $requestBody, bool $withXMLAttributes = false, bool $convertToSoap = true): stdClass
+    public function request(string $method, array $requestBody, bool $withXMLAttributes = false, bool $convertToSoap = true): stdClass|array
     {
         try {
             $response = $this->soapClient->$method($convertToSoap ? $this->arrayToSoapVar($requestBody) : $requestBody);
