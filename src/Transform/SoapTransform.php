@@ -122,6 +122,7 @@ trait SoapTransform
     public function transformToArrayValues(stdClass $object, int $startIndex = 0, ?int $onlyIndexPath = null)
     {
         $pathes = [
+            ['guest', 'net'],
             ['latestPage', 'TaskInfo'],
             ['returnval', 'sampleInfo'],
             ['returnval', 'value', 'value'],
