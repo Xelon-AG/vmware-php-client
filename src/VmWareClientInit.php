@@ -141,7 +141,8 @@ class VmWareClientInit
             $this->createSoapSession();
         } elseif (
             $this->isSessionExpired($sessionInfo['expired_at'])
-            || Carbon::now()->diffInSeconds(Carbon::parse($sessionInfo['expired_at']), true) < 30
+            || (Carbon::parse($sessionInfo['expired_at'])->isFuture() 
+                && Carbon::now()->diffInSeconds(Carbon::parse($sessionInfo['expired_at'])) < 30)
         ) {
             $this->createSoapClientWithExistingSession($sessionInfo['vmware_soap_session']);
             $this->deleteSoapSession();
