@@ -125,6 +125,7 @@ trait SoapTransform
             ['guest', 'net'],
             ['latestPage', 'TaskInfo'],
             ['returnval', 'sampleInfo'],
+            ['returnval', 'value'],
             ['returnval', 'value', 'value'],
             ['returnval', 'config', 'consumerId'],
             ['layoutEx', 'disk'],
