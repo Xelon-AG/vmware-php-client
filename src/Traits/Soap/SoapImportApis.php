@@ -185,25 +185,6 @@ trait SoapImportApis
                         'bootOrder' => $configSpec->bootOptions->bootOrder ?? null,
                         'networkBootProtocol' => $configSpec->bootOptions->networkBootProtocol ?? null,
                     ] : null,
-                    'vAppConfig' => [
-                        'product' => isset($configSpec->vAppConfig->product) ? [
-                            'operation' => $configSpec->vAppConfig->product->operation ?? null,
-                            'info' => $configSpec->vAppConfig->product->info ? [
-                                'key' => $configSpec->vAppConfig->product->info->key ?? null,
-                                'classId' => $configSpec->vAppConfig->product->info->classId ?? null,
-                                'instanceId' => $configSpec->vAppConfig->product->info->instanceId ?? null,
-                                'name' => $configSpec->vAppConfig->product->info->name ?? null,
-                                'vendor' => $configSpec->vAppConfig->product->info->vendor ?? null,
-                                'version' => $configSpec->vAppConfig->product->info->version ?? null,
-                                'fullVersion' => $configSpec->vAppConfig->product->info->fullVersion ?? null,
-                                'vendorUrl' => $configSpec->vAppConfig->product->info->vendorUrl ?? null,
-                                'productUrl' => $configSpec->vAppConfig->product->info->productUrl ?? null,
-                                'appUrl' => $configSpec->vAppConfig->product->info->appUrl ?? null,
-                            ] : null,
-                        ] : null,
-                        'installBootRequired' => $configSpec->vAppConfig->installBootRequired ?? null,
-                        'installBootStopDelay' => $configSpec->vAppConfig->installBootStopDelay ?? null,
-                    ],
                     'firmware' => $configSpec->firmware ?? null,
                     'nestedHVEnabled' => $configSpec->nestedHVEnabled ?? null,
                     'sgxInfo' => isset($configSpec->sgxInfo) ? [
@@ -218,7 +199,41 @@ trait SoapImportApis
             'host' => $host,
         ];
 
+        $body['vAppConfig'] = [];
+        $body['vAppConfig']['product'] = null;
+        $body['vAppConfig']['installBootRequired'] = $configSpec->vAppConfig->installBootRequired ?? null;
+        $body['vAppConfig']['installBootStopDelay'] = $configSpec->vAppConfig->installBootStopDelay ?? null;
+
+        if (isset($configSpec->vAppConfig->product)) {
+            if (is_array($configSpec->vAppConfig->product)) {
+                foreach ($configSpec->vAppConfig->product as $product) {
+                    $body['vAppConfig']['product'][] = $this->makeProduct($product);
+                }
+            } else {
+                $body['vAppConfig']['product'] = $this->makeProduct($product);
+            }
+        }
+
         return $this->request('ImportVApp', $body);
+    }
+
+    private function makeProduct($product): array
+    {
+        return [
+            'operation' => $product->operation ?? null,
+            'info' => $product->info ? [
+                'key' => $product->info->key ?? null,
+                'classId' => $product->info->classId ?? null,
+                'instanceId' => $product->info->instanceId ?? null,
+                'name' => $product->info->name ?? null,
+                'vendor' => $product->info->vendor ?? null,
+                'version' => $product->info->version ?? null,
+                'fullVersion' => $product->info->fullVersion ?? null,
+                'vendorUrl' => $product->info->vendorUrl ?? null,
+                'productUrl' => $product->info->productUrl ?? null,
+                'appUrl' => $product->info->appUrl ?? null,
+            ] : null
+        ];
     }
 
     private function build($data, $arrayToBuild, $object = null)
