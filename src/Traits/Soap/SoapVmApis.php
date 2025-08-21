@@ -129,6 +129,72 @@ trait SoapVmApis
         return $this->transformPropSetArray($result->returnval ?? []);
     }
 
+    public function getGuestIdsByVmId(string $vmId): array
+    {
+        $body = [
+            '_this' => [
+                '_'   => 'propertyCollector',
+                'type'=> 'PropertyCollector',
+            ],
+            'specSet' => [
+                'propSet' => [
+                    'type'    => 'VirtualMachine',
+                    'all'     => false,
+                    'pathSet' => ['environmentBrowser'],
+                ],
+                'objectSet' => [
+                    'obj' => [
+                        '_'   => $vmId,
+                        'type'=> 'VirtualMachine',
+                    ],
+                ],
+            ],
+        ];
+
+        $result = $this->soapClient->RetrieveProperties($body);
+
+        $envBrowser = $result->returnval->propSet->val ?? null;
+
+        if (! $envBrowser) {
+            return [];
+        }
+
+        $queryBody = [
+            '_this' => $envBrowser,
+            'key'   => null,
+            'host'  => null,
+        ];
+
+        $configResult = $this->soapClient->QueryConfigOption($queryBody);
+
+        if (empty($configResult->returnval->guestOSDescriptor)) {
+            return [];
+        }
+
+        $guestIds = [];
+        foreach ($configResult->returnval->guestOSDescriptor as $os) {
+            $guestIds[] = [
+                'id'       => $os->id,
+                'fullName' => $os->fullName,
+                'family'   => $os->family,
+            ];
+        }
+
+        return $guestIds;
+    }
+
+    public function changeGuestId(string $vmId, string $guestOs)
+    {
+        $body = [
+            'spec' => [
+                '@type' => 'VirtualMachineConfigSpec',
+                'guestId' => $guestOs,
+            ]
+        ];
+
+        return $this->vmRequest('ReconfigVM_Task', $vmId, $body);
+    }
+
     public function getNetworksBySwitchIds(array $switchIds, $pathSet = null)
     {
         $networks = [];
