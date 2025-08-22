@@ -129,6 +129,59 @@ trait SoapVmApis
         return $this->transformPropSetArray($result->returnval ?? []);
     }
 
+    public function getGuestOsListByVmId(string $vmId): array
+    {
+        $body = [
+            '_this' => [
+                '_'   => 'propertyCollector',
+                'type'=> 'PropertyCollector',
+            ],
+            'specSet' => [
+                'propSet' => [
+                    'type'    => 'VirtualMachine',
+                    'all'     => false,
+                    'pathSet' => ['environmentBrowser'],
+                ],
+                'objectSet' => [
+                    'obj' => [
+                        '_'   => $vmId,
+                        'type'=> 'VirtualMachine',
+                    ],
+                ],
+            ],
+        ];
+
+        $result = $this->soapClient->RetrieveProperties($body);
+
+        $envBrowser = $result->returnval->propSet->val ?? null;
+
+        if (! $envBrowser) {
+            return [];
+        }
+
+        $queryBody = [
+            '_this' => $envBrowser,
+            'key'   => null,
+            'host'  => null,
+        ];
+
+        $configResult = $this->soapClient->QueryConfigOption($queryBody);
+
+        return $configResult->returnval->guestOSDescriptor ?? [];
+    }
+
+    public function changeGuestId(string $vmId, string $guestId)
+    {
+        $body = [
+            'spec' => [
+                '@type' => 'VirtualMachineConfigSpec',
+                'guestId' => $guestId,
+            ]
+        ];
+
+        return $this->vmRequest('ReconfigVM_Task', $vmId, $body);
+    }
+
     public function getNetworksBySwitchIds(array $switchIds, $pathSet = null)
     {
         $networks = [];
