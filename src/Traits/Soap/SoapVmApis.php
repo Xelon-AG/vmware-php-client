@@ -129,7 +129,7 @@ trait SoapVmApis
         return $this->transformPropSetArray($result->returnval ?? []);
     }
 
-    public function getGuestIdsByVmId(string $vmId): array
+    public function getGuestOsListByVmId(string $vmId): array
     {
         $body = [
             '_this' => [
@@ -167,28 +167,15 @@ trait SoapVmApis
 
         $configResult = $this->soapClient->QueryConfigOption($queryBody);
 
-        if (empty($configResult->returnval->guestOSDescriptor)) {
-            return [];
-        }
-
-        $guestIds = [];
-        foreach ($configResult->returnval->guestOSDescriptor as $os) {
-            $guestIds[] = [
-                'id'       => $os->id,
-                'fullName' => $os->fullName,
-                'family'   => $os->family,
-            ];
-        }
-
-        return $guestIds;
+        return $configResult->returnval->guestOSDescriptor ?? [];
     }
 
-    public function changeGuestId(string $vmId, string $guestOs)
+    public function changeGuestId(string $vmId, string $guestId)
     {
         $body = [
             'spec' => [
                 '@type' => 'VirtualMachineConfigSpec',
-                'guestId' => $guestOs,
+                'guestId' => $guestId,
             ]
         ];
 
