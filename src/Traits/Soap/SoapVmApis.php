@@ -275,6 +275,12 @@ trait SoapVmApis
                     : null,
                 'customization' => $params['spec']['customization'] ?? null,
                 'powerOn' => $params['spec']['powerOn'] ?? true,
+                'snapshot' => (isset($params['spec']['snapshot']) && $params['spec']['snapshot'])
+                    ? [
+                        'type' => 'VirtualMachineSnapshot',
+                        '_' => $params['spec']['snapshot'],
+                    ]
+                    : null,
                 /*'bootOptions' => [
                     'bootDelay' => $params['spec']['bootOptions']['bootDelay'] ?? 0,
                     'bootRetryEnabled' => $params['spec']['bootOptions']['bootRetryEnabled'] ?? true,
