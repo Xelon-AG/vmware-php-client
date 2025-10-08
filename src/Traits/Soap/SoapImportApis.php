@@ -210,7 +210,7 @@ trait SoapImportApis
                     $body['vAppConfig']['product'][] = $this->makeProduct($product);
                 }
             } else {
-                $body['vAppConfig']['product'] = $this->makeProduct($product);
+                $body['vAppConfig']['product'] = $this->makeProduct($configSpec->vAppConfig->product);
             }
         }
 
