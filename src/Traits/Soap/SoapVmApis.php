@@ -266,12 +266,14 @@ trait SoapVmApis
                 ],
                 'template' => $params['spec']['template'] ?? false,
                 'config' => isset($params['spec']['config'])
-                    ? [
+                    ? array_filter([
                         'numCPUs' => $params['spec']['config']['numCPUs'],
                         'numCoresPerSocket' => $params['spec']['config']['numCoresPerSocket'],
                         'memoryMB' => $params['spec']['config']['memoryMB'],
+                        'memoryHotAddEnabled' => $params['spec']['config']['memoryHotAddEnabled'] ?? null,
+                        'cpuHotAddEnabled' => $params['spec']['config']['cpuHotAddEnabled'] ?? null,
                         'deviceChange' => $params['spec']['config']['deviceChange'] ?? null,
-                    ]
+                    ], fn ($value) => $value !== null)
                     : null,
                 'customization' => $params['spec']['customization'] ?? null,
                 'powerOn' => $params['spec']['powerOn'] ?? true,
