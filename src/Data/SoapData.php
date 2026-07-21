@@ -261,6 +261,23 @@ class SoapData
         ]);
     }
 
+    public function addVirtualCdRomSpec(int $controllerKey, int $unitNumber): VirtualCdrom
+    {
+        return new VirtualCdrom([
+            'key' => -1,
+            'backing' => new VirtualCdromRemoteAtapiBackingInfo([
+                'deviceName' => 'CDRom',
+            ]),
+            'connectable' => new VirtualDeviceConnectInfo([
+                'startConnected' => false,
+                'allowGuestControl' => true,
+                'connected' => false,
+            ]),
+            'controllerKey' => $controllerKey,
+            'unitNumber' => $unitNumber,
+        ]);
+    }
+
     public function unmountVirtualCdRomSpec(int $key, int $controllerKey): VirtualCdrom
     {
         return new VirtualCdrom([
