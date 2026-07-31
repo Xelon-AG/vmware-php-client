@@ -1,0 +1,31 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Argument of an invalid type Xelon\\\\VmWareClient\\\\Types\\\\Core\\\\DynamicData supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: src/Types/Core/DynamicData.php
+
+		-
+			message: "#^Dead catch \\- GuzzleHttp\\\\Exception\\\\ClientException is already caught above\\.$#"
+			count: 5
+			path: src/VcenterClient.php
+
+		-
+			message: "#^Access to an undefined property Exception\\:\\:\\$detail\\.$#"
+			count: 2
+			path: src/VcenterSoapClient.php
+
+		-
+			message: "#^Access to an undefined property Xelon\\\\VmWareClient\\\\VcenterSoapClient\\:\\:\\$version\\.$#"
+			count: 11
+			path: src/VcenterSoapClient.php
+
+		-
+			message: "#^Ternary operator condition is always true\\.$#"
+			count: 6
+			path: src/VcenterSoapClient.php
+
+		-
+			message: "#^Variable \\$result might not be defined\\.$#"
+			count: 2
+			path: src/VcenterSoapClient.php
