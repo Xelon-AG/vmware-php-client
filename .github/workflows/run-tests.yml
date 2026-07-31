@@ -23,7 +23,7 @@ jobs:
             testbench: '8.*'
             php: '8.2'
           - laravel: '11.*'
-            testbench: '9.*'
+            testbench: '^9.5'
             php: '8.2'
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
