@@ -20,7 +20,7 @@ trait SoapGuestApis
         ?string $localFilePath,
         string $guestFilePath,
         array $params = [],
-        string $data = null
+        ?string $data = null
     ): void {
         if ($localFilePath) {
             $fullScriptPath = base_path($localFilePath);

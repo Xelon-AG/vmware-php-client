@@ -36,7 +36,7 @@ trait SoapImportApis
         return $this->request('ParseDescriptor', $body);
     }
 
-    public function createImportSpec(string $ovfPath, string $resourcepool, string $datastore, array $networkMapping = null)
+    public function createImportSpec(string $ovfPath, string $resourcepool, string $datastore, ?array $networkMapping = null)
     {
         $body = [
             '_this' => [

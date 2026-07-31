@@ -502,7 +502,7 @@ trait SoapVmApis
         string $name,
         array $vmIds,
         bool $isAntiAffinity = false,
-        int $key = null // unique rule key (remote_rule_id)
+        ?int $key = null // unique rule key (remote_rule_id)
     ) {
         $vm = [];
 
